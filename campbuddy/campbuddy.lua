@@ -119,6 +119,7 @@ local function helpmsg()
 
 PPrint('CampBuddy help. Timers won\'t appair until the chosen mob(s) are defeated.');
 PPrint('/cbud add H M S     - will prepare a timer for the current targeted mob.');
+PPrint('/cbud add ID H M S     - will prepare a timer for the defined mob ID.');
 PPrint('/cbud del ID     - delete chosen timer.');
 PPrint('/cbud del all     - delete all timers.');
 PPrint('/cbud list     - print timers list.');
@@ -137,19 +138,33 @@ ashita.events.register("command", "command_callback1", function (e)
         local cmd = args[2];
 
         if (cmd == "add") then
-            if GetIdForMatch() == '0x0' then
-                PPrint("Missing target");
-			elseif (args[3] == nil or args[4] == nil or args[5] == nil) then
-				PPrint("Unable to create timer; Missing parameters (Need H M S)");
-			else
-				local h = tonumber(args[3]);
-				local m = tonumber(args[4]);
-				local s = tonumber(args[5]);
-				local totaltime = (h * 3600) + (m * 60) + s;
-				local id = GetIdForMatch()
-                trackids[id] = totaltime;
-				PPrint(id..' set to '..totaltime..' seconds');
-			end;
+			if (#args == 5) then
+				if GetIdForMatch() == '0x0' then
+					PPrint("Missing target");
+				elseif (args[3] == nil or args[4] == nil or args[5] == nil) then
+					PPrint("Unable to create timer; Missing parameters (Need H M S)");
+				else
+					local h = tonumber(args[3]);
+					local m = tonumber(args[4]);
+					local s = tonumber(args[5]);
+					local totaltime = (h * 3600) + (m * 60) + s;
+					local id = GetIdForMatch()
+					trackids[id] = totaltime;
+					PPrint(id..' set to '..totaltime..' seconds');
+				end;
+			elseif (#args == 6) then
+				if (args[3] == nil or args[4] == nil or args[5] == nil or args[6] == nil) then
+					PPrint("Unable to create timer; Missing parameters (Need H M S)");
+				else
+					local h = tonumber(args[4]);
+					local m = tonumber(args[5]);
+					local s = tonumber(args[6]);
+					local totaltime = (h * 3600) + (m * 60) + s;
+					local id = string.upper(args[3])
+					trackids[id] = totaltime;
+					PPrint(id..' set to '..totaltime..' seconds');
+				end;
+			end
 		elseif (cmd == "del") then
 			if (args[3] == nil) then
 				PPrint("Missing timer label in arguments");
