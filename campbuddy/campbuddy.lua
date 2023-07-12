@@ -93,7 +93,7 @@ local function onMessage(data)
 
     if (deathMes:contains(message)) then
         local target = struct.unpack('i2', data, 0x14 + 1);
-        --local sender = struct.unpack('i2', data, 0x16 + 1);
+        local sender = struct.unpack('i2', data, 0x16 + 1);
 
         local targetServerId = AshitaCore:GetMemoryManager():GetEntity():GetServerId(sender);
         local targetServerIdHex = string.format('0x%X', targetServerId);
