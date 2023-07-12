@@ -1,6 +1,6 @@
 addon.name      = "campbuddy";
 addon.author    = "Aesk";
-addon.version   = "1.1";
+addon.version   = "1.2";
 addon.desc      = "Placeholder repop clock";
 
 require('common');
