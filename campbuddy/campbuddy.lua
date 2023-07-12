@@ -1,12 +1,11 @@
 addon.name      = "campbuddy";
 addon.author    = "Aesk";
-addon.version   = "1.0";
+addon.version   = "1.1";
 addon.desc      = "Placeholder repop clock";
 
 require('common');
 local fonts = require("fonts");
 
-local phtimer = 0;
 local trackids = T{};
 local playsound = false;
 local sound = 'ding.wav';
@@ -100,10 +99,13 @@ local function onMessage(data)
     
         local idString = string.sub(targetServerIdHex, -3);
 
-        if (trackids ~= nil) and (phtimer > 0) then
-            if (trackids:contains(idString)) then
-                CreateNewTimer(idString, phtimer)
-				PPrint(idString..' timer started')
+        if (trackids ~= nil) then
+			for k,v in pairs(trackids) do
+				--PPrint(k..' '..v);
+				if (k == idString) then
+					CreateNewTimer(idString, trackids[idString])
+					PPrint(idString..' timer started')
+				end
             end
         end
     end
@@ -118,8 +120,11 @@ local function helpmsg()
 PPrint('CampBuddy help. Timers won\'t appair until the chosen mob(s) are defeated.');
 PPrint('/cbud add H M S     - will prepare a timer for the current targeted mob.');
 PPrint('/cbud del ID     - delete chosen timer.');
+PPrint('/cbud del all     - delete all timers.');
+PPrint('/cbud list     - print timers list.');
 PPrint('/cbud move X Y     - move the timers.');
-PPrint('/cbud sound     - toggles sound when a timer reaches 00:00:00.');
+PPrint('/cbud sound     - toggle sound when a timer reaches 00:00:00.');
+PPrint('/cbud help     - print help.');
 
 end
 
@@ -141,24 +146,44 @@ ashita.events.register("command", "command_callback1", function (e)
 				local m = tonumber(args[4]);
 				local s = tonumber(args[5]);
 				local totaltime = (h * 3600) + (m * 60) + s;
-                table.insert(trackids, GetIdForMatch());
-                phtimer = totaltime;
-				PPrint(GetIdForMatch()..' set to '..totaltime);
+				local id = GetIdForMatch()
+                trackids[id] = totaltime;
+				PPrint(id..' set to '..totaltime..' seconds');
 			end;
 		elseif (cmd == "del") then
 			if (args[3] == nil) then
 				PPrint("Missing timer label in arguments");
+			elseif (args[3] == 'all') then
+				for i,v in pairs(allTimers) do
+					allTimers[i].time = 0;
+				end;
+				trackids = {};
+				PPrint("Clearing all timers.");
 			else
 				for i=1,#allTimers do
 					if (allTimers[i].label == args[3]) then
 						allTimers[i].time = 0;
-                        PPrint("Clearing timer");
-                        return;
-					end;
-				end;
+					end
+				end
+				for k,v in pairs(trackids) do
+					if (k == args[3]) then
+						PPrint("Clearing timer "..k);
+						trackids[k] = nil;
+						return;
+					end
+				end
 
                 PPrint("No timer found with that label");
 			end;
+		elseif (cmd == 'list') then
+			local next = next;
+			if next(trackids) == nil then
+				PPrint("No timers found");
+			else
+				for k,v in pairs(trackids) do
+					PPrint(k..' - '..v..' seconds');
+				end;
+			end
         elseif (cmd == 'sound') then
                 playsound = not playsound;
                 PPrint("Sound is "..tostring(playsound));
@@ -228,7 +253,6 @@ ashita.events.register("d3d_present", "present_cb", function ()
 					indexToRemove = x;
 				end;
 			end;
-
 			table.remove(allTimers, indexToRemove);
 		end;
 
