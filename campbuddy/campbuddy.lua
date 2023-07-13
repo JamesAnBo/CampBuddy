@@ -2,6 +2,7 @@ addon.name      = "campbuddy";
 addon.author    = "Aesk";
 addon.version   = "1.2";
 addon.desc      = "Placeholder repop clock";
+addon.link      = "https://github.com/JamesAnBo/CampBuddy";
 
 require('common');
 local fonts = require("fonts");
