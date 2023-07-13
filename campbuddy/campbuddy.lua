@@ -1,6 +1,6 @@
 addon.name      = 'campbuddy';
 addon.author    = 'Aesk';
-addon.version   = '1.3';
+addon.version   = '1.3.1';
 addon.desc      = 'Placeholder repop clock';
 addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
@@ -171,7 +171,7 @@ ashita.events.register('command', 'command_callback1', function (e)
         e.blocked = true;
         local cmd = args[2];
 
-        if (cmd == 'addtg') then
+        if (cmd == 'addtg') or (cmd == 'tgadd') then
 			if (#args == 5) then
 				local id = GetIdForMatch();
 				if (id == '0x0') or (id == nil) then
@@ -189,7 +189,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 					PPrint(id..' set to '..totaltime..' seconds');
 				end;
 			end;
-		elseif (cmd == 'addid') then
+		elseif (cmd == 'addid') or (cmd == 'idadd') then
 			if (#args == 6) then
 				if (args[3] == nil or args[4] == nil or args[5] == nil or args[6] == nil) then
 					PPrint('Unable to create timer; Missing parameters (Need ID H M S)');
@@ -207,7 +207,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 					PPrint(id..' set to '..totaltime..' seconds');
 				end;
 			end
-		elseif (cmd == 'addpr') then
+		elseif (cmd == 'addpr') or (cmd == 'pradd') then
 			if (#args == 3) then
 				if (args[3] == nil) then
 					PPrint('Unable to create timer; Missing parameters (Need profile name)');
