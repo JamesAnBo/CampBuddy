@@ -1,11 +1,13 @@
-addon.name      = "campbuddy";
-addon.author    = "Aesk";
-addon.version   = "1.2";
-addon.desc      = "Placeholder repop clock";
-addon.link      = "https://github.com/JamesAnBo/CampBuddy";
+addon.name      = 'campbuddy';
+addon.author    = 'Aesk';
+addon.version   = '1.3';
+addon.desc      = 'Placeholder repop clock';
+addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
 require('common');
-local fonts = require("fonts");
+--local mobid = require('mobid');
+local profiles = require('profiles');
+local fonts = require('fonts');
 
 local trackids = T{};
 local playsound = false;
@@ -18,7 +20,7 @@ local globalDelay = 1;
 local fontSettings = T{
 	visible = true,
 	color = 0xFFFFFFFF,
-	font_family = "Tahoma",
+	font_family = 'Tahoma',
 	font_height = 11,
 	position_x = 500,
 	position_y = 500,
@@ -28,7 +30,27 @@ local fontTimer = fonts.new(fontSettings);
 fontTimer.background.color = 0xCC000000;
 fontTimer.background.visible = true;
 
-function GetStPartyIndex()
+local function GetIsMob(targetEntity)
+	if (targetEntity == nil) then
+		return false;
+	end
+    -- Obtain the entity spawn flags..
+    local flag = targetEntity.SpawnFlags;
+    -- Determine the entity type
+	local isMob;
+    if (bit.band(flag, 0x0001) == 0x0001 or bit.band(flag, 0x0002) == 0x0002) then --players and npcs
+        isMob = false;
+    else --mob
+		isMob = true;
+    end
+	return isMob;
+end
+
+-- local function GetIsMobByIndex(index)
+	-- return (bit.band(AshitaCore:GetMemoryManager():GetEntity():GetSpawnFlags(index), 0x10) ~= 0);
+-- end
+
+local function GetStPartyIndex()
     local ptr = AshitaCore:GetPointerManager():Get('party');
     ptr = ashita.memory.read_uint32(ptr);
     ptr = ashita.memory.read_uint32(ptr);
@@ -40,7 +62,7 @@ function GetStPartyIndex()
     end
 end
 
-function GetSubTargetActive()
+local function GetSubTargetActive()
     local playerTarget = AshitaCore:GetMemoryManager():GetTarget();
     if (playerTarget == nil) then
         return false;
@@ -48,7 +70,7 @@ function GetSubTargetActive()
     return playerTarget:GetIsSubTargetActive() == 1 or (GetStPartyIndex() ~= nil and playerTarget:GetTargetIndex(0) ~= 0);
 end
 
-function GetTargets()
+local function GetTargets()
     local playerTarget = AshitaCore:GetMemoryManager():GetTarget();
     local party = AshitaCore:GetMemoryManager():GetParty();
 
@@ -77,14 +99,20 @@ local function GetIdForMatch()
         targetEntity = GetEntity(targetIndex);
     end
 
-    local targetServerId = AshitaCore:GetMemoryManager():GetEntity():GetServerId(targetIndex);
-    local targetServerIdHex = string.format('0x%X', targetServerId);
+	if (targetEntity == nil or targetEntity.Name == nil) then
+		return;
+	end
+	
+	local isMonster = GetIsMob(targetEntity);
+	
+	if (isMonster) then
+		local targetServerId = AshitaCore:GetMemoryManager():GetEntity():GetServerId(targetIndex);
+		local targetServerIdHex = string.format('0x%X', targetServerId);
 
-    local idString = string.sub(targetServerIdHex, -3);
+		local idString = string.sub(targetServerIdHex, -3);
 
-    --PPrint('ID: '..targetServerId..' HEX: '..targetServerIdHex..' Entity: '..targetIndex)
-
-    return idString;
+		return idString;
+	end
 end
 
 local deathMes = T { 6, 20, 97, 113, 406, 605, 646 };
@@ -119,18 +147,23 @@ end;
 local function helpmsg()
 
 PPrint('CampBuddy help. Timers won\'t appair until the chosen mob(s) are defeated.');
-PPrint('/cbud add H M S     - will prepare a timer for the current targeted mob.');
-PPrint('/cbud add ID H M S     - will prepare a timer for the defined mob ID.');
-PPrint('/cbud del ID     - delete chosen timer.');
+PPrint('/cbud addtg <H> <M> <S>     - will prepare a timer for the current targeted mob.');
+PPrint('/cbud addid <ID> <H> <M> <S>     - will prepare a timer for the defined mob ID.');
+PPrint('/cbud addpr <profile>     - will prepare a timers for the defined profile.');
+PPrint('/cbud del <ID>     - delete chosen timer.');
 PPrint('/cbud del all     - delete all timers.');
 PPrint('/cbud list     - print timers list.');
-PPrint('/cbud move X Y     - move the timers.');
+PPrint('/cbud move <X> <Y>     - move the timers.');
 PPrint('/cbud sound     - toggle sound when a timer reaches 00:00:00.');
 PPrint('/cbud help     - print help.');
 
 end
 
-ashita.events.register("command", "command_callback1", function (e)
+local function IsNum(str)
+	return not (str == "" or str:find("%D")) 
+end
+
+ashita.events.register('command', 'command_callback1', function (e)
     local args = e.command:args();
     if (#args == 0 or (args[1] ~= '/cbud' and args[1] ~= '/campbuddy')) then
         return;
@@ -138,24 +171,32 @@ ashita.events.register("command", "command_callback1", function (e)
         e.blocked = true;
         local cmd = args[2];
 
-        if (cmd == "add") then
+        if (cmd == 'addtg') then
 			if (#args == 5) then
-				if GetIdForMatch() == '0x0' then
-					PPrint("Missing target");
+				local id = GetIdForMatch();
+				if (id == '0x0') or (id == nil) then
+					PPrint('Missing or invalid target');
 				elseif (args[3] == nil or args[4] == nil or args[5] == nil) then
-					PPrint("Unable to create timer; Missing parameters (Need H M S)");
+					PPrint('Unable to create timer; Missing parameters (Need H M S)');
+				elseif (not IsNum(args[3]) or not IsNum(args[4]) or not IsNum(args[5])) then
+					PPrint('Unable to create timer; H M S must be numbers')
 				else
 					local h = tonumber(args[3]);
 					local m = tonumber(args[4]);
 					local s = tonumber(args[5]);
 					local totaltime = (h * 3600) + (m * 60) + s;
-					local id = GetIdForMatch()
 					trackids[id] = totaltime;
 					PPrint(id..' set to '..totaltime..' seconds');
 				end;
-			elseif (#args == 6) then
+			end;
+		elseif (cmd == 'addid') then
+			if (#args == 6) then
 				if (args[3] == nil or args[4] == nil or args[5] == nil or args[6] == nil) then
-					PPrint("Unable to create timer; Missing parameters (Need H M S)");
+					PPrint('Unable to create timer; Missing parameters (Need ID H M S)');
+				elseif (string.len(args[3]) ~= 3) then
+					PPrint('Unable to create timer; ID must be 3 characters');
+				elseif (not IsNum(args[4]) or not IsNum(args[5]) or not IsNum(args[6])) then
+					PPrint('Unable to create timer; H M S must be numbers')
 				else
 					local h = tonumber(args[4]);
 					local m = tonumber(args[5]);
@@ -166,15 +207,39 @@ ashita.events.register("command", "command_callback1", function (e)
 					PPrint(id..' set to '..totaltime..' seconds');
 				end;
 			end
-		elseif (cmd == "del") then
+		elseif (cmd == 'addpr') then
+			if (#args == 3) then
+				if (args[3] == nil) then
+					PPrint('Unable to create timer; Missing parameters (Need profile name)');
+				else
+					local profile = {};
+					for k,v in pairs(profiles) do
+						if (string.lower(args[3]) == string.lower(k)) then
+							profile = profiles[k];
+						end
+					end
+					if (profile ~= nil) then
+						for k,v in pairs(profile) do
+							local id = k
+							trackids[id] = v;
+							PPrint(k..' set to '..v..' seconds');
+						end
+					else
+						PPrint('No profile found for that NM')
+					end
+				end
+			else
+				PPrint('Unable to create timer; No spaces in profile names.');
+			end
+		elseif (cmd == 'del') then
 			if (args[3] == nil) then
-				PPrint("Missing timer label in arguments");
+				PPrint('Missing timer label in arguments');
 			elseif (args[3] == 'all') then
 				for i,v in pairs(allTimers) do
 					allTimers[i].time = 0;
 				end;
 				trackids = {};
-				PPrint("Clearing all timers.");
+				PPrint('Clearing all timers.');
 			else
 				for i=1,#allTimers do
 					if (allTimers[i].label == args[3]) then
@@ -183,18 +248,18 @@ ashita.events.register("command", "command_callback1", function (e)
 				end
 				for k,v in pairs(trackids) do
 					if (k == args[3]) then
-						PPrint("Clearing timer "..k);
+						PPrint('Clearing timer '..k);
 						trackids[k] = nil;
 						return;
 					end
 				end
 
-                PPrint("No timer found with that label");
+                PPrint('No timer found with that label');
 			end;
 		elseif (cmd == 'list') then
 			local next = next;
 			if next(trackids) == nil then
-				PPrint("No timers found");
+				PPrint('No timers found');
 			else
 				for k,v in pairs(trackids) do
 					PPrint(k..' - '..v..' seconds');
@@ -202,17 +267,28 @@ ashita.events.register("command", "command_callback1", function (e)
 			end
         elseif (cmd == 'sound') then
                 playsound = not playsound;
-                PPrint("Sound is "..tostring(playsound));
+                PPrint('Sound is '..tostring(playsound));
+        elseif (cmd == 'warnpt') then
+                warnpt = not warnpt;
+                PPrint('Warnpt is '..tostring(warnpt));
         elseif (cmd == 'move') then
             if (args[3] == nil or args[4] == nil) then
-				PPrint("Unable to move timers; Missing parameters (Need X Y)");
+				PPrint('Unable to move timers; Missing parameters (Need X Y)');
 			else
                 fontTimer.position_x = tonumber(args[3]);
                 fontTimer.position_y = tonumber(args[4]);
-				 PPrint("Position set to "..fontTimer.position_x..' '..fontTimer.position_y);
+				 PPrint('Position set to '..fontTimer.position_x..' '..fontTimer.position_y);
             end
 		elseif (cmd == 'help') then
 			helpmsg();
+			
+		elseif (cmd == 'test') then
+			local id = GetIdForMatch();
+			if (id == '0x0') or (id == nil) then
+				PPrint('Missing or invalid target')
+			else
+				PPrint('Current target ID: '..id);
+			end
 		end
     end
 end);
@@ -221,7 +297,7 @@ ashita.events.register('load', 'load_cb', function ()
 	
 end);
 
-ashita.events.register("unload", "unload_callback1", function ()
+ashita.events.register('unload', 'unload_callback1', function ()
     fontTimer:destroy();
 end);
 
@@ -233,7 +309,7 @@ ashita.events.register('packet_in', 'packet_in_th_cb', function(e)
     end
 end);
 
-ashita.events.register("d3d_present", "present_cb", function ()
+ashita.events.register('d3d_present', 'present_cb', function ()
 	local cleanupList = {};
 	if  (os.time() >= (globalTimer + globalDelay)) then
 		globalTimer = os.time();
@@ -245,18 +321,18 @@ ashita.events.register("d3d_present", "present_cb", function ()
                     ashita.misc.play_sound(addon.path:append('\\sounds\\'):append(sound));
                 end
                 table.insert(cleanupList, v.id);
-            end
+			end
         end
 	end;
 
 	-- Update timer display
-    local strOut = "";
+    local strOut = '';
     for i,v in pairs(allTimers) do
         if (v.time >= 0) then
             local h = v.time / 3600;
             local m = (v.time % 3600) / 60;
             local s = ((v.time % 3600) % 60);
-            strOut = strOut .. string.format("%s> %02d:%02d:%02d\n", v.label, h, m, s);
+            strOut = strOut .. string.format('%s> %02d:%02d:%02d\n', v.label, h, m, s);
         end
     end
     fontTimer.text = strOut:sub(1, #strOut - 1);
@@ -281,5 +357,5 @@ function CreateNewTimer(txtName, maxTime)
 end;
 
 function PPrint(txt)
-    print(string.format("[\30\08CampBuddy\30\01] %s", txt));
+    print(string.format('[\30\08CampBuddy\30\01] %s', txt));
 end
