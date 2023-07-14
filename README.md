@@ -17,8 +17,8 @@ Here are your campbuddy commands:
 /cbud list  print timers list.
 /cbud move <X> <Y>  move the timers.
 /cbud sound  toggle sound when a timer reaches 00:00:00.
+/cbud info  prints target ID, clock position, and sound status.
 /cbud help  print help.
-/cbud test  prints the ID for your current target.
 ```
 If you want to change any settings permanently you'll have to edit the settings at the top of the lua. It's all pretty obvious what options there are.
 
