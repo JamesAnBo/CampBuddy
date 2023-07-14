@@ -1,6 +1,6 @@
 addon.name      = 'campbuddy';
 addon.author    = 'Aesk';
-addon.version   = '1.5';
+addon.version   = '1.6.0';
 addon.desc      = 'Placeholder repop clock';
 addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
@@ -39,6 +39,25 @@ end
 
 local function all_trim(str)
    return str:gsub("%s+", "")
+end
+
+local function tableHasKey(table,key)
+    return table[key] ~= nil
+end
+
+local function formatTime(sec)
+	local h = sec / 3600;
+	local m = (sec % 3600) / 60;
+	local s = ((sec % 3600) % 60);
+	
+	return string.format('%02d:%02d:%02d\n', h, m, s);
+end
+
+-- in some helper module
+local function utils_Set(list)
+    local set = {}
+    for _, l in ipairs(list) do set[l] = true end
+    return set
 end
 
 local function GetIsMob(targetEntity)
@@ -141,7 +160,7 @@ local function onMessage(data)
     
         local idString = string.sub(targetServerIdHex, -3);
 		
-		--PPrint(string.lower(targetNameTrim));
+		PPrint(string.lower(targetNameTrim));
         if (trackids ~= nil) then
 			for k,v in pairs(trackids) do
 				--PPrint(k..' '..v);
@@ -161,6 +180,23 @@ local function onMessage(data)
             end
 		end
     end
+end
+
+local function checktracker(s)
+	if (trackids ~= nil) then
+		for k,v in pairs(trackids) do
+			if (s == k) then
+				return true;
+			end
+		end
+	end
+	if (tracknames ~= nil) then
+		for k,v in pairs(tracknames) do
+			if (s == k) then
+				return true;
+			end
+		end
+	end
 end
 
 local function onZone(e)
@@ -208,17 +244,17 @@ ashita.events.register('command', 'command_callback1', function (e)
 					local s = tonumber(args[5]);
 					local totaltime = (h * 3600) + (m * 60) + s;
 					trackids[id] = totaltime;
-					PPrint(id..' set to '..totaltime..' seconds');
+					PPrint(id..' set to '..formatTime(totaltime));
 				end;
 			elseif (#args == 3) then
 				if (args[3] == nil or IsNum(args[3])) then
 					PPrint('Unable to create timer; Missing parameters (Need zone type)');
 				elseif (args[3] == 'dng') then
 					trackids[id] = dng;
-					PPrint(id..' set to '..dng..' seconds');
+					PPrint(id..' set to '..formatTime(dng));
 				elseif (args[3] == 'fld') then
 					trackids[id] = fld;
-					PPrint(id..' set to '..fld..' seconds');
+					PPrint(id..' set to '..formatTime(fld));
 				end
 			end;
 		elseif (cmd == 'addid') or (cmd == 'idadd') then
@@ -236,7 +272,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 					local totaltime = (h * 3600) + (m * 60) + s;
 					local id = string.upper(args[3])
 					trackids[id] = totaltime;
-					PPrint(id..' set to '..totaltime..' seconds');
+					PPrint(id..' set to '..formatTime(totaltime));
 				end;
 			elseif (#args == 4) then
 				if (args[3] == nil or args[4] == nil or IsNum(args[4]))  then
@@ -246,11 +282,11 @@ ashita.events.register('command', 'command_callback1', function (e)
 				elseif (args[4] == 'dng') then
 					local id = string.upper(args[3])
 					trackids[id] = dng;
-					PPrint(id..' set to '..dng..' seconds');
+					PPrint(id..' set to '..formatTime(dng));
 				elseif (args[4] == 'fld') then
 					local id = string.upper(args[3])
 					trackids[id] = fld;
-					PPrint(id..' set to '..fld..' seconds');
+					PPrint(id..' set to '..formatTime(fld));
 				end
 			end
 		elseif (cmd == 'addpr') or (cmd == 'pradd') then
@@ -258,20 +294,78 @@ ashita.events.register('command', 'command_callback1', function (e)
 				if (args[3] == nil) then
 					PPrint('Unable to create timer; Missing parameters (Need profile name)');
 				else
-					local profile = {};
+					local ignore = T{'nickname','zone'};
+					local noprofile = true;
 					for k,v in pairs(profiles) do
-						if (string.lower(args[3]) == string.lower(k)) then
-							profile = profiles[k];
+						for k,v in pairs(profiles.PH) do
+							local name = all_trim(k);
+							local lowername = string.lower(name);
+							local nickname = profiles.PH[k].nickname;
+							local zone = profiles.PH[k].zone;
+							if (string.lower(args[3]) == lowername) then
+								local profile = profiles.PH[k].placeholders;
+								if (profile ~= nil) then
+									for k,v in pairs(profile) do
+										if not ignore:contains(k) then
+											if not checktracker(k) then
+												local id = k;
+												trackids[id] = v;
+												PPrint(k..' set to '..formatTime(v));
+											end
+										end
+									end
+									noprofile = false;
+								end
+							elseif (string.lower(args[3]) == string.lower(nickname)) then
+								local profile = profiles.PH[k].placeholders;
+								if (profile ~= nil) then
+									for k,v in pairs(profile) do
+										if not ignore:contains(k) then
+											if not checktracker(k) then
+												local id = k;
+												trackids[id] = v;
+												PPrint(k..' set to '..formatTime(v));
+											end
+										end
+									end
+									noprofile = false;
+								end
+							elseif (string.lower(args[3]) == string.lower(zone)) then
+								local profile = profiles.PH[k].placeholders;
+								if (profile ~= nil) then
+									for k,v in pairs(profile) do
+										if not ignore:contains(k) then
+											if not checktracker(k) then
+												local id = k;
+												trackids[id] = v;
+												PPrint(k..' set to '..formatTime(v));
+											end
+										end
+									end
+									noprofile = false;
+								end
+							end
 						end
 					end
-					if (profile ~= nil) then
-						for k,v in pairs(profile) do
-							local id = k
-							trackids[id] = v;
-							PPrint(k..' set to '..v..' seconds');
+					for k,v in pairs(profiles.NMsets) do
+						if (string.lower(args[3]) == string.lower(k)) then
+							local profile = profiles.NMsets[k];
+							if (profile ~= nil) then
+								for k,v in pairs(profile) do
+									if not ignore:contains(k) then
+										if not checktracker(k) then
+											local name = k;
+											tracknames[name] = v;
+											PPrint(k..' set to '..formatTime(v));
+										end
+									end
+								end
+								noprofile = false;
+							end
 						end
-					else
-						PPrint('No profile found for that NM')
+					end
+					if noprofile == true then
+							PPrint('No profile found')
 					end
 				end
 			else
@@ -294,7 +388,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 					local totaltime = (h * 3600) + (m * 60) + s;
 					local name = string.lower(args[3])
 					tracknames[name] = totaltime;
-					PPrint(name..' set to '..totaltime..' seconds');
+					PPrint(name..' set to '..formatTime(totaltime));
 				end;
 			end;
 		elseif (cmd == 'del') then
@@ -337,12 +431,12 @@ ashita.events.register('command', 'command_callback1', function (e)
 			else
 				if (trackids ~= nil) then
 					for k,v in pairs(trackids) do
-						PPrint(k..' - '..v..' seconds');
+						PPrint(k..' - '..formatTime(v));
 					end;
 				end
 				if (tracknames ~= nil) then
 					for k,v in pairs(tracknames) do
-						PPrint(k..' - '..v..' seconds');
+						PPrint(k..' - '..formatTime(v));
 					end;
 				end
 			end
