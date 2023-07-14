@@ -1,6 +1,6 @@
 addon.name      = 'campbuddy';
 addon.author    = 'Aesk';
-addon.version   = '1.3.2';
+addon.version   = '1.3.3';
 addon.desc      = 'Placeholder repop clock';
 addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
@@ -14,13 +14,13 @@ local allTimers = {};	-- NO TOUCH!
 local globalTimer = 0;	-- NO TOUCH!
 local globalDelay = 1;	-- NO TOUCH!
 
-local playsound = false;	-- Change to true for default sound on
+local playsound = true;	-- Change to true for default sound on
 local sound = 'ding.wav';	-- if you want a custom sound (must be .wav) define it here and put the .wav in the sounds folder.
 local fontSettings = T{
 	visible = true,
 	color = 0xFFFFFFFF,
 	font_family = 'Tahoma',
-	font_height = 11,	-- Change this to make things bigger or smaller.
+	font_height = 22,	-- Change this to make things bigger or smaller.
 	position_x = 500,	-- Change this to set a default up/down position.
 	position_y = 500,	-- Change this to set a default left/right position.
 };
@@ -154,6 +154,7 @@ PPrint('/cbud del all     - delete all timers.');
 PPrint('/cbud list     - print timers list.');
 PPrint('/cbud move <X> <Y>     - move the timers.');
 PPrint('/cbud sound     - toggle sound when a timer reaches 00:00:00.');
+PPrint('/cbud info     - print some info.');
 PPrint('/cbud help     - print help.');
 
 end
@@ -281,13 +282,15 @@ ashita.events.register('command', 'command_callback1', function (e)
 		elseif (cmd == 'help') then
 			helpmsg();
 			
-		elseif (cmd == 'test') then
+		elseif (cmd == 'info') then
 			local id = GetIdForMatch();
 			if (id == '0x0') or (id == nil) then
 				PPrint('Missing or invalid target')
 			else
 				PPrint('Current target ID: '..id);
 			end
+			PPrint('Position is '..fontTimer.position_x..' '..fontTimer.position_y);
+			PPrint('Sound is '..tostring(playsound));
 		end
     end
 end);
