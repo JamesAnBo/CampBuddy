@@ -3,7 +3,7 @@ An addon for ashita to help you track placeholder repop times.
 
 When there's a timer prepared using the below commands, when the chosen mob(s) die, a timer will automatically be started. You'll see it on your screen. It will continue to start again whenever the chosen mob dies. You will not see a timer until the chosen mob dies. The timer starts when you see the "X was defeated by Y." or other similar defeat messages. So set your timers accordingly (and extra 16 seconds normally).
 
-Once you put it into you addons folder (..\HorizonXI-Launcher\HorizonXI\Game\addons\campbuddy) load it with
+Once you put it into you addons folder (`..\HorizonXI-Launcher\HorizonXI\Game\addons\campbuddy`) load it with
 `/addon load campbuddy`
 
 Here are your campbuddy commands:
@@ -20,6 +20,8 @@ Here are your campbuddy commands:
 /cbud info  prints target ID, clock position, and sound status.
 /cbud help  print help.
 ```
+When using `addtg` or `addid` commands you can also use `dng` (16min 16sec) or `fld` (5min 46sec) instead of a defined H M S.
+
 If you want to change any settings permanently you'll have to edit the settings at the top of the lua. It's all pretty obvious what options there are.
 
 If you want to add a new NM profile, You'll need to manually add it to profiles.lua.
