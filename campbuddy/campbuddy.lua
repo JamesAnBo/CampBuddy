@@ -141,7 +141,7 @@ local function onMessage(data)
     
         local idString = string.sub(targetServerIdHex, -3);
 		
-		PPrint(string.lower(targetNameTrim));
+		--PPrint(string.lower(targetNameTrim));
         if (trackids ~= nil) then
 			for k,v in pairs(trackids) do
 				--PPrint(k..' '..v);
