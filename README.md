@@ -11,6 +11,7 @@ Here are your campbuddy commands:
 ```
 /cbud addtg <H> <M> <S>  will prepare a timer for the current targeted mob.
 /cbud addid <ID> <H> <M> <S>  will prepare a timer for the defined mob ID.
+/cbud addnm <name> <H> <M> <S>  will prepare a timer for the defined mob name (name must not contain spaces).
 /cbud addpr <profile>  will prepare a timers for the defined profile.
 /cbud del <ID>  delete chosen timer.
 /cbud del all  delete all timers.
@@ -20,6 +21,9 @@ Here are your campbuddy commands:
 /cbud info  prints target ID, clock position, and sound status.
 /cbud help  print help.
 ```
+Timers created with `addtg` or `addid` (ID named timers) will not renew after zoning.
+Timers created with `addnm` (Mob named timers) will renew, even if you've zoned (as long as you can see the defeat message in chat).
+
 When using `addtg` or `addid` commands you can also use `dng` (16min 16sec) or `fld` (5min 46sec) instead of a defined H M S.
 
 If you want to change any settings permanently you'll have to edit the settings at the top of the lua. It's all pretty obvious what options there are.
