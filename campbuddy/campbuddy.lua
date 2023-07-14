@@ -1,6 +1,6 @@
 addon.name      = 'campbuddy';
 addon.author    = 'Aesk';
-addon.version   = '1.3.3';
+addon.version   = '1.4';
 addon.desc      = 'Placeholder repop clock';
 addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
@@ -13,6 +13,9 @@ local trackids = T{};	-- NO TOUCH!
 local allTimers = {};	-- NO TOUCH!
 local globalTimer = 0;	-- NO TOUCH!
 local globalDelay = 1;	-- NO TOUCH!
+
+local dng = 976;	-- Dungeon timers (00:16:16) 
+local fld = 346;	-- Field timers (00:05:46)
 
 local playsound = true;	-- Change to true for default sound on
 local sound = 'ding.wav';	-- if you want a custom sound (must be .wav) define it here and put the .wav in the sounds folder.
@@ -146,6 +149,7 @@ end;
 local function helpmsg()
 
 PPrint('CampBuddy help. Timers won\'t appair until the chosen mob(s) are defeated.');
+PPrint('Zone type (dng or fld) instead of H M S works too.');
 PPrint('/cbud addtg <H> <M> <S>     - will prepare a timer for the current targeted mob.');
 PPrint('/cbud addid <ID> <H> <M> <S>     - will prepare a timer for the defined mob ID.');
 PPrint('/cbud addpr <profile>     - will prepare a timers for the defined profile.');
@@ -172,8 +176,8 @@ ashita.events.register('command', 'command_callback1', function (e)
         local cmd = args[2];
 
         if (cmd == 'addtg') or (cmd == 'tgadd') then
+			local id = GetIdForMatch();
 			if (#args == 5) then
-				local id = GetIdForMatch();
 				if (id == '0x0') or (id == nil) then
 					PPrint('Missing or invalid target');
 				elseif (args[3] == nil or args[4] == nil or args[5] == nil) then
@@ -188,6 +192,16 @@ ashita.events.register('command', 'command_callback1', function (e)
 					trackids[id] = totaltime;
 					PPrint(id..' set to '..totaltime..' seconds');
 				end;
+			elseif (#args == 3) then
+				if (args[3] == nil or IsNum(args[3])) then
+					PPrint('Unable to create timer; Missing parameters (Need zone type)');
+				elseif (args[3] == 'dng') then
+					trackids[id] = dng;
+					PPrint(id..' set to '..dng..' seconds');
+				elseif (args[3] == 'fld') then
+					trackids[id] = fld;
+					PPrint(id..' set to '..fld..' seconds');
+				end
 			end;
 		elseif (cmd == 'addid') or (cmd == 'idadd') then
 			if (#args == 6) then
@@ -206,6 +220,20 @@ ashita.events.register('command', 'command_callback1', function (e)
 					trackids[id] = totaltime;
 					PPrint(id..' set to '..totaltime..' seconds');
 				end;
+			elseif (#args == 4) then
+				if (args[3] == nil or args[4] == nil or IsNum(args[4]))  then
+					PPrint('Unable to create timer; Missing parameters (Need ID and zone type)');
+				elseif (string.len(args[3]) ~= 3) then
+					PPrint('Unable to create timer; ID must be 3 characters');
+				elseif (args[4] == 'dng') then
+					local id = string.upper(args[3])
+					trackids[id] = dng;
+					PPrint(id..' set to '..dng..' seconds');
+				elseif (args[4] == 'fld') then
+					local id = string.upper(args[3])
+					trackids[id] = fld;
+					PPrint(id..' set to '..fld..' seconds');
+				end
 			end
 		elseif (cmd == 'addpr') or (cmd == 'pradd') then
 			if (#args == 3) then
