@@ -21,8 +21,11 @@ Here are your campbuddy commands:
 /cbud info  prints target ID, clock position, and sound status.
 /cbud help  print help.
 ```
-Timers created with `addtg` or `addid` (ID named timers) will not renew after zoning.
+Timers created with `addtg` or `addid` (ID named timers) will not renew after zoning.<br />
 Timers created with `addnm` (Mob named timers) will renew, even if you've zoned (as long as you can see the defeat message in chat).
+
+This is so you can make a timer for the NM itself and set it for the window reopen.<br />
+Example: `/cbud addnm Despot 2 0 0` will start a 2hour timer when you see Despot die.
 
 When using `addtg` or `addid` commands you can also use `dng` (16min 16sec) or `fld` (5min 46sec) instead of a defined H M S.
 
