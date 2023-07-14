@@ -1,29 +1,28 @@
 addon.name      = 'campbuddy';
 addon.author    = 'Aesk';
-addon.version   = '1.3.1';
+addon.version   = '1.3.2';
 addon.desc      = 'Placeholder repop clock';
 addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
 require('common');
---local mobid = require('mobid');
+
 local profiles = require('profiles');
 local fonts = require('fonts');
 
-local trackids = T{};
-local playsound = false;
-local sound = 'ding.wav';
+local trackids = T{};	-- NO TOUCH!
+local allTimers = {};	-- NO TOUCH!
+local globalTimer = 0;	-- NO TOUCH!
+local globalDelay = 1;	-- NO TOUCH!
 
-local allTimers = {};
-local globalTimer = 0;
-local globalDelay = 1;
-
+local playsound = false;	-- Change to true for default sound on
+local sound = 'ding.wav';	-- if you want a custom sound (must be .wav) define it here and put the .wav in the sounds folder.
 local fontSettings = T{
 	visible = true,
 	color = 0xFFFFFFFF,
 	font_family = 'Tahoma',
-	font_height = 11,
-	position_x = 500,
-	position_y = 500,
+	font_height = 11,	-- Change this to make things bigger or smaller.
+	position_x = 500,	-- Change this to set a default up/down position.
+	position_y = 500,	-- Change this to set a default left/right position.
 };
 
 local fontTimer = fonts.new(fontSettings);
@@ -141,7 +140,7 @@ local function onMessage(data)
 end
 
 local function onZone(e)
-    trackids = {};
+    trackids = {}; --Clears tracked IDs on zone, but does not stop current running clocks.
 end;
 
 local function helpmsg()
@@ -291,10 +290,6 @@ ashita.events.register('command', 'command_callback1', function (e)
 			end
 		end
     end
-end);
-
-ashita.events.register('load', 'load_cb', function ()
-	
 end);
 
 ashita.events.register('unload', 'unload_callback1', function ()
