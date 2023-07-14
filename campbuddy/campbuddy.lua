@@ -1,6 +1,6 @@
 addon.name      = 'campbuddy';
 addon.author    = 'Aesk';
-addon.version   = '1.4';
+addon.version   = '1.5';
 addon.desc      = 'Placeholder repop clock';
 addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
@@ -9,6 +9,7 @@ require('common');
 local profiles = require('profiles');
 local fonts = require('fonts');
 
+local tracknames = T{}; -- NO TOUCH!
 local trackids = T{};	-- NO TOUCH!
 local allTimers = {};	-- NO TOUCH!
 local globalTimer = 0;	-- NO TOUCH!
@@ -31,6 +32,14 @@ local fontSettings = T{
 local fontTimer = fonts.new(fontSettings);
 fontTimer.background.color = 0xCC000000;
 fontTimer.background.visible = true;
+
+local function IsNum(str)
+	return not (str == "" or str:find("%D")) 
+end
+
+local function all_trim(str)
+   return str:gsub("%s+", "")
+end
 
 local function GetIsMob(targetEntity)
 	if (targetEntity == nil) then
@@ -125,11 +134,14 @@ local function onMessage(data)
         local target = struct.unpack('i2', data, 0x14 + 1);
         local sender = struct.unpack('i2', data, 0x16 + 1);
 
+		local targetName = AshitaCore:GetMemoryManager():GetEntity():GetName(sender);
+		local targetNameTrim = all_trim(targetName);
         local targetServerId = AshitaCore:GetMemoryManager():GetEntity():GetServerId(sender);
         local targetServerIdHex = string.format('0x%X', targetServerId);
     
         local idString = string.sub(targetServerIdHex, -3);
-
+		
+		PPrint(string.lower(targetNameTrim));
         if (trackids ~= nil) then
 			for k,v in pairs(trackids) do
 				--PPrint(k..' '..v);
@@ -139,6 +151,15 @@ local function onMessage(data)
 				end
             end
         end
+		if (tracknames ~= nil) then
+			for k,v in pairs(tracknames) do
+				--PPrint(k..' '..v);
+				if (k == string.lower(targetNameTrim)) then
+					CreateNewTimer(targetNameTrim, tracknames[string.lower(targetNameTrim)])
+					PPrint(targetNameTrim..' timer started')
+				end
+            end
+		end
     end
 end
 
@@ -152,6 +173,7 @@ PPrint('CampBuddy help. Timers won\'t appair until the chosen mob(s) are defeate
 PPrint('Zone type (dng or fld) instead of H M S works too.');
 PPrint('/cbud addtg <H> <M> <S>     - will prepare a timer for the current targeted mob.');
 PPrint('/cbud addid <ID> <H> <M> <S>     - will prepare a timer for the defined mob ID.');
+PPrint('/cbud addnm <name> <H> <M> <S>     - will prepare a timer for the defined mob name (no spaces).');
 PPrint('/cbud addpr <profile>     - will prepare a timers for the defined profile.');
 PPrint('/cbud del <ID>     - delete chosen timer.');
 PPrint('/cbud del all     - delete all timers.');
@@ -161,10 +183,6 @@ PPrint('/cbud sound     - toggle sound when a timer reaches 00:00:00.');
 PPrint('/cbud info     - print some info.');
 PPrint('/cbud help     - print help.');
 
-end
-
-local function IsNum(str)
-	return not (str == "" or str:find("%D")) 
 end
 
 ashita.events.register('command', 'command_callback1', function (e)
@@ -259,6 +277,26 @@ ashita.events.register('command', 'command_callback1', function (e)
 			else
 				PPrint('Unable to create timer; No spaces in profile names.');
 			end
+		elseif (cmd == 'addnm') or (cmd == 'nmadd') then
+			if (#args >= 7) then
+				PPrint('Unable to create timer; Too many parameters (Name cannot contain spaces)');
+			elseif (#args == 6) then
+				if (args[3] == nil or args[4] == nil or args[5] == nil or args[6] == nil) then
+					PPrint('Unable to create timer; Missing parameters (Need ID H M S)');
+				elseif (not IsNum(args[4])) and (IsNum(args[5]) or IsNum(args[6])) then
+					PPrint('Unable to create timer; Name cannot contain spaces')
+				elseif (not IsNum(args[4]) or not IsNum(args[5]) or not IsNum(args[6])) then
+					PPrint('Unable to create timer; H M S must be numbers')
+				else
+					local h = tonumber(args[4]);
+					local m = tonumber(args[5]);
+					local s = tonumber(args[6]);
+					local totaltime = (h * 3600) + (m * 60) + s;
+					local name = string.lower(args[3])
+					tracknames[name] = totaltime;
+					PPrint(name..' set to '..totaltime..' seconds');
+				end;
+			end;
 		elseif (cmd == 'del') then
 			if (args[3] == nil) then
 				PPrint('Missing timer label in arguments');
@@ -267,6 +305,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 					allTimers[i].time = 0;
 				end;
 				trackids = {};
+				tracknames = {};
 				PPrint('Clearing all timers.');
 			else
 				for i=1,#allTimers do
@@ -281,17 +320,31 @@ ashita.events.register('command', 'command_callback1', function (e)
 						return;
 					end
 				end
+				for k,v in pairs(tracknames) do
+					if (k == args[3]) then
+						PPrint('Clearing timer '..k);
+						tracknames[k] = nil;
+						return;
+					end
+				end
 
                 PPrint('No timer found with that label');
 			end;
 		elseif (cmd == 'list') then
 			local next = next;
-			if next(trackids) == nil then
+			if (next(trackids) == nil) and (next(tracknames) == nil) then
 				PPrint('No timers found');
 			else
-				for k,v in pairs(trackids) do
-					PPrint(k..' - '..v..' seconds');
-				end;
+				if (trackids ~= nil) then
+					for k,v in pairs(trackids) do
+						PPrint(k..' - '..v..' seconds');
+					end;
+				end
+				if (tracknames ~= nil) then
+					for k,v in pairs(tracknames) do
+						PPrint(k..' - '..v..' seconds');
+					end;
+				end
 			end
         elseif (cmd == 'sound') then
                 playsound = not playsound;
