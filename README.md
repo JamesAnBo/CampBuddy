@@ -13,6 +13,8 @@ Here are your campbuddy commands:
 /cbud addid <ID> <H> <M> <S>  will prepare a timer for the defined mob ID.
 /cbud addnm <name> <H> <M> <S>  will prepare a timer for the defined mob name (name must not contain spaces).
 /cbud addpr <profile>  will prepare a timers for the defined profile.
+/cbud start <ID or name>  force start defined timer with max time.
+/cbud start <ID or name> <H> <M> <S>  force start defined timer at H M S.
 /cbud del <ID>  delete chosen timer.
 /cbud del all  delete all timers.
 /cbud list  print timers list.
