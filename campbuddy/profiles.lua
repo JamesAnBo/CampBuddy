@@ -1,4 +1,3 @@
---v. 1.6.0
 local profiles = {}
 
 local profiles = T{

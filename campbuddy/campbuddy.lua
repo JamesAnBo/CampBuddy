@@ -1,6 +1,6 @@
 addon.name      = 'campbuddy';
 addon.author    = 'Aesk';
-addon.version   = '1.6.0';
+addon.version   = '1.7.0';
 addon.desc      = 'Placeholder repop clock';
 addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
@@ -160,6 +160,7 @@ local function onMessage(data)
     
         local idString = string.sub(targetServerIdHex, -3);
 		
+		--PPrint(string.lower(targetNameTrim));
         if (trackids ~= nil) then
 			for k,v in pairs(trackids) do
 				--PPrint(k..' '..v);
@@ -181,23 +182,6 @@ local function onMessage(data)
     end
 end
 
-local function checktracker(s)
-	if (trackids ~= nil) then
-		for k,v in pairs(trackids) do
-			if (s == k) then
-				return true;
-			end
-		end
-	end
-	if (tracknames ~= nil) then
-		for k,v in pairs(tracknames) do
-			if (s == k) then
-				return true;
-			end
-		end
-	end
-end
-
 local function onZone(e)
     trackids = {}; --Clears tracked IDs on zone, but does not stop current running clocks.
 end;
@@ -210,6 +194,8 @@ PPrint('/cbud addtg <H> <M> <S>     - will prepare a timer for the current targe
 PPrint('/cbud addid <ID> <H> <M> <S>     - will prepare a timer for the defined mob ID.');
 PPrint('/cbud addnm <name> <H> <M> <S>     - will prepare a timer for the defined mob name (no spaces).');
 PPrint('/cbud addpr <profile>     - will prepare a timers for the defined profile.');
+PPrint('/cbud start <ID or name>     - force start defined timer with max time.');
+PPrint('/cbud start <ID or name> <H> <M> <S>    - force start defined timer at H M S');
 PPrint('/cbud del <ID>     - delete chosen timer.');
 PPrint('/cbud del all     - delete all timers.');
 PPrint('/cbud list     - print timers list.');
@@ -230,10 +216,10 @@ ashita.events.register('command', 'command_callback1', function (e)
 
         if (cmd == 'addtg') or (cmd == 'tgadd') then
 			local id = GetIdForMatch();
-			if (#args == 5) then
-				if (id == '0x0') or (id == nil) then
-					PPrint('Missing or invalid target');
-				elseif (args[3] == nil or args[4] == nil or args[5] == nil) then
+			if (id == '0x0') or (id == nil) then
+				PPrint('Missing or invalid target')
+			elseif (#args == 5) then
+				if (args[3] == nil or args[4] == nil or args[5] == nil) then
 					PPrint('Unable to create timer; Missing parameters (Need H M S)');
 				elseif (not IsNum(args[3]) or not IsNum(args[4]) or not IsNum(args[5])) then
 					PPrint('Unable to create timer; H M S must be numbers')
@@ -306,7 +292,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 								if (profile ~= nil) then
 									for k,v in pairs(profile) do
 										if not ignore:contains(k) then
-											if not checktracker(k) then
+											if not tableHasKey(trackids,k) then
 												local id = k;
 												trackids[id] = v;
 												PPrint(k..' set to '..formatTime(v));
@@ -320,7 +306,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 								if (profile ~= nil) then
 									for k,v in pairs(profile) do
 										if not ignore:contains(k) then
-											if not checktracker(k) then
+											if not tableHasKey(trackids,k) then
 												local id = k;
 												trackids[id] = v;
 												PPrint(k..' set to '..formatTime(v));
@@ -334,7 +320,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 								if (profile ~= nil) then
 									for k,v in pairs(profile) do
 										if not ignore:contains(k) then
-											if not checktracker(k) then
+											if not tableHasKey(trackids,k) then
 												local id = k;
 												trackids[id] = v;
 												PPrint(k..' set to '..formatTime(v));
@@ -352,7 +338,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 							if (profile ~= nil) then
 								for k,v in pairs(profile) do
 									if not ignore:contains(k) then
-										if not checktracker(k) then
+										if not tableHasKey(tracknames,k) then
 											local name = k;
 											tracknames[name] = v;
 											PPrint(k..' set to '..formatTime(v));
@@ -423,6 +409,44 @@ ashita.events.register('command', 'command_callback1', function (e)
 
                 PPrint('No timer found with that label');
 			end;
+		elseif (cmd == 'start') then
+			if (#args == 3) then
+				if (args[3] == nil) then
+					PPrint('Unable to start timer; No timer found');
+				elseif (tableHasKey(trackids, string.upper(args[3]))) then
+					local id = string.upper(args[3])
+					CreateNewTimer(id, trackids[id])
+				elseif (tableHasKey(tracknames,string.lower(args[3]))) then
+					local name = string.lower(args[3])
+					CreateNewTimer(name, tracknames[name])
+				else
+					PPrint('No timer found');
+				end;
+			elseif (#args == 6) then
+				if (args[3] == nil or args[4] == nil or args[5] == nil or args[6] == nil) then
+					PPrint('Unable to create timer; Missing parameters (Need ID H M S)');
+				elseif (not IsNum(args[4]) or not IsNum(args[5]) or not IsNum(args[6])) then
+					PPrint('Unable to create timer; H M S must be numbers')
+				else
+					local h = tonumber(args[4]);
+					local m = tonumber(args[5]);
+					local s = tonumber(args[6]);
+					local totaltime = (h * 3600) + (m * 60) + s;
+					local id = string.upper(args[3]);
+					local name = string.lower(args[3]);
+					if (tableHasKey(trackids,string.upper(args[3]))) then
+						CreateNewTimer(id, totaltime)
+						PPrint(id..' started at '..formatTime(totaltime));
+					elseif (tableHasKey(tracknames,string.lower(args[3]))) then
+						CreateNewTimer(name, totaltime)
+						PPrint(name..' started at '..formatTime(totaltime));
+					else
+						PPrint('No timer found');
+					end;
+				end;
+			else
+				PPrint('Unable to start timer; Missing parameters');
+			end;				
 		elseif (cmd == 'list') then
 			local next = next;
 			if (next(trackids) == nil) and (next(tracknames) == nil) then
