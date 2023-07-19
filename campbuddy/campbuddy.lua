@@ -1,6 +1,6 @@
 addon.name      = 'campbuddy';
 addon.author    = 'Aesk';
-addon.version   = '1.7.0';
+addon.version   = '1.7.1';
 addon.desc      = 'Placeholder repop clock';
 addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
@@ -200,6 +200,9 @@ PPrint('/cbud del <ID>     - delete chosen timer.');
 PPrint('/cbud del all     - delete all timers.');
 PPrint('/cbud list     - print timers list.');
 PPrint('/cbud move <X> <Y>     - move the timers.');
+PPrint('/cbud size <size>     - resize the timers');
+PPrint('/cbud bg     - toggle background');
+PPrint('/cbud hide     - toggle visibility');
 PPrint('/cbud sound     - toggle sound when a timer reaches 00:00:00.');
 PPrint('/cbud info     - print some info.');
 PPrint('/cbud help     - print help.');
@@ -477,18 +480,30 @@ ashita.events.register('command', 'command_callback1', function (e)
                 fontTimer.position_y = tonumber(args[4]);
 				 PPrint('Position set to '..fontTimer.position_x..' '..fontTimer.position_y);
             end
-		elseif (cmd == 'help') then
+        elseif (cmd == 'size') then
+            if (args[3] == nil) then
+				PPrint('Unable to resize timers; Missing parameters (Needs a size)');
+			else
+                fontTimer.font_height = tonumber(args[3]);
+				 PPrint('Size set to '..fontTimer.font_height);
+            end
+	elseif (cmd == 'bg') then
+		fontTimer.background.visible = not fontTimer.background.visible;
+		PPrint('Background set to '..tostring(fontTimer.background.visible));
+        elseif (cmd == 'hide') then
+                fontTimer.visible = not fontTimer.visible;
+		PPrint('Visible set to '..tonumber(fontTimer.visible));
+	elseif (cmd == 'help') then
 			helpmsg();
-			
-		elseif (cmd == 'info') then
+	elseif (cmd == 'info') then
 			local id = GetIdForMatch();
 			if (id == '0x0') or (id == nil) then
 				PPrint('Missing or invalid target')
 			else
 				PPrint('Current target ID: '..id);
 			end
-			PPrint('Position is '..fontTimer.position_x..' '..fontTimer.position_y);
-			PPrint('Sound is '..tostring(playsound));
+			PPrint('[Position: '..fontTimer.position_x..' '..fontTimer.position_y..'] [Size: '..fontTimer.font_height..']');
+			PPrint('[Sound: '..tostring(playsound)..'] [Background: '..tostring(fontTimer.background.visible)..'] [Visible: '..tostring(fontTimer.visible)..']');
 		end
     end
 end);
