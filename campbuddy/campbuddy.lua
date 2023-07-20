@@ -26,7 +26,7 @@ local fontSettings = T{
 	visible = true,
 	color = 0xFFFFFFFF,
 	font_family = 'Tahoma',
-	font_height = 22,	-- Change this to make things bigger or smaller.
+	font_height = 16,	-- Change this to make things bigger or smaller.
 	position_x = 500,	-- Change this to set a default up/down position.
 	position_y = 500,	-- Change this to set a default left/right position.
 };
