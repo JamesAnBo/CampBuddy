@@ -20,7 +20,7 @@ local dng = 976;	-- Dungeon timers (00:16:16)
 local fld = 346;	-- Field timers (00:05:46)
 
 local zoneProfiles = true; -- If true, profiles will auto load on zone in and addon load.
-local playsound = true;	-- Change to true for default sound on
+local playsound = true; -- if true, a sound will play when a timer reaches 00:00:00.
 local sound = 'ding.wav';	-- if you want a custom sound (must be .wav) define it here and put the .wav in the sounds folder.
 local fontSettings = T{
 	visible = true,
