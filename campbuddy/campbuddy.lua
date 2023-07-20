@@ -1,10 +1,11 @@
 addon.name      = 'campbuddy';
 addon.author    = 'Aesk';
-addon.version   = '1.7.1';
+addon.version   = '1.8';
 addon.desc      = 'Placeholder repop clock';
 addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
 require('common');
+local zones = require('zones');
 
 local profiles = require('profiles');
 local fonts = require('fonts');
@@ -18,13 +19,14 @@ local globalDelay = 1;	-- NO TOUCH!
 local dng = 976;	-- Dungeon timers (00:16:16) 
 local fld = 346;	-- Field timers (00:05:46)
 
+local zoneProfiles = true;
 local playsound = true;	-- Change to true for default sound on
 local sound = 'ding.wav';	-- if you want a custom sound (must be .wav) define it here and put the .wav in the sounds folder.
 local fontSettings = T{
 	visible = true,
 	color = 0xFFFFFFFF,
 	font_family = 'Tahoma',
-	font_height = 16,	-- Change this to make things bigger or smaller.
+	font_height = 22,	-- Change this to make things bigger or smaller.
 	position_x = 500,	-- Change this to set a default up/down position.
 	position_y = 500,	-- Change this to set a default left/right position.
 };
@@ -34,7 +36,7 @@ fontTimer.background.color = 0xCC000000;
 fontTimer.background.visible = true;
 
 local function IsNum(str)
-	return not (str == "" or str:find("%D")) 
+	return not (str == "" or str:find("%D"))
 end
 
 local function all_trim(str)
@@ -145,6 +147,13 @@ local function GetIdForMatch()
 	end
 end
 
+local function GetZone()
+    local zone = AshitaCore:GetMemoryManager():GetParty():GetMemberZone(0)
+    local zoneName = zones[zone]
+	
+	return zoneName;
+end
+
 local deathMes = T { 6, 20, 97, 113, 406, 605, 646 };
 local function onMessage(data)
     local message = struct.unpack('i2', data, 0x18 + 1);
@@ -165,7 +174,8 @@ local function onMessage(data)
 			for k,v in pairs(trackids) do
 				--PPrint(k..' '..v);
 				if (k == idString) then
-					CreateNewTimer(idString, trackids[idString])
+					trackids[k].count = (trackids[k].count + 1)
+					CreateNewTimer(idString, trackids[k].count, trackids[k].maxTime)
 					PPrint(idString..' timer started')
 				end
             end
@@ -174,7 +184,8 @@ local function onMessage(data)
 			for k,v in pairs(tracknames) do
 				--PPrint(k..' '..v);
 				if (k == string.lower(targetNameTrim)) then
-					CreateNewTimer(targetNameTrim, tracknames[string.lower(targetNameTrim)])
+					tracknames[k].count = (tracknames[k].count + 1)
+					CreateNewTimer(targetNameTrim, tracknames[k].count, tracknames[k].maxTime)
 					PPrint(targetNameTrim..' timer started')
 				end
             end
@@ -186,6 +197,36 @@ local function onZone(e)
     trackids = {}; --Clears tracked IDs on zone, but does not stop current running clocks.
 end;
 
+local function onZoneLoad(e)
+	local ignore = T{'nickname','group','zone'};
+	local noprofile = true;
+	for k,v in pairs(profiles) do
+		for k,v in pairs(profiles.PH) do
+			local name = all_trim(k);
+			local lowername = string.lower(name);
+			local nickname = profiles.PH[k].nickname;
+			local zone = profiles.PH[k].zone;
+			if (GetZone() == string.upper(zone)) then
+				local profile = profiles.PH[k].placeholders;
+				if (profile ~= nil) then
+					for k,v in pairs(profile) do
+						if not ignore:contains(k) then
+							if not tableHasKey(trackids,k) then
+								local tbl = {
+									maxTime = v,
+									count = 0
+								};
+								trackids[k] = tbl;
+								PPrint(k..' set to '..formatTime(v));
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 local function helpmsg()
 
 PPrint('CampBuddy help. Timers won\'t appair until the chosen mob(s) are defeated.');
@@ -194,6 +235,7 @@ PPrint('/cbud addtg <H> <M> <S>     - will prepare a timer for the current targe
 PPrint('/cbud addid <ID> <H> <M> <S>     - will prepare a timer for the defined mob ID.');
 PPrint('/cbud addnm <name> <H> <M> <S>     - will prepare a timer for the defined mob name (no spaces).');
 PPrint('/cbud addpr <profile>     - will prepare a timers for the defined profile.');
+PPrint('/cbud zonepr     - toggle loading profiles when you enter zones.');
 PPrint('/cbud start <ID or name>     - force start defined timer with max time.');
 PPrint('/cbud start <ID or name> <H> <M> <S>    - force start defined timer at H M S');
 PPrint('/cbud del <ID>     - delete chosen timer.');
@@ -231,17 +273,29 @@ ashita.events.register('command', 'command_callback1', function (e)
 					local m = tonumber(args[4]);
 					local s = tonumber(args[5]);
 					local totaltime = (h * 3600) + (m * 60) + s;
-					trackids[id] = totaltime;
+					local tbl = {
+						maxTime = totaltime,
+						count = 0
+					};
+					trackids[id] = tbl;
 					PPrint(id..' set to '..formatTime(totaltime));
 				end;
 			elseif (#args == 3) then
 				if (args[3] == nil or IsNum(args[3])) then
 					PPrint('Unable to create timer; Missing parameters (Need zone type)');
 				elseif (args[3] == 'dng') then
-					trackids[id] = dng;
+					local tbl = {
+						maxTime = dng,
+						count = 0
+					};
+					trackids[id] = tbl;
 					PPrint(id..' set to '..formatTime(dng));
 				elseif (args[3] == 'fld') then
-					trackids[id] = fld;
+					local tbl = {
+						maxTime = fld,
+						count = 0
+					};
+					trackids[id] = tbl;
 					PPrint(id..' set to '..formatTime(fld));
 				end
 			end;
@@ -259,7 +313,11 @@ ashita.events.register('command', 'command_callback1', function (e)
 					local s = tonumber(args[6]);
 					local totaltime = (h * 3600) + (m * 60) + s;
 					local id = string.upper(args[3])
-					trackids[id] = totaltime;
+					local tbl = {
+						maxTime = totaltime,
+						count = 0
+					};
+					trackids[id] = tbl;
 					PPrint(id..' set to '..formatTime(totaltime));
 				end;
 			elseif (#args == 4) then
@@ -269,11 +327,19 @@ ashita.events.register('command', 'command_callback1', function (e)
 					PPrint('Unable to create timer; ID must be 3 characters');
 				elseif (args[4] == 'dng') then
 					local id = string.upper(args[3])
-					trackids[id] = dng;
+					local tbl = {
+						maxTime = dng,
+						count = 0
+					};
+					trackids[id] = tbl;
 					PPrint(id..' set to '..formatTime(dng));
 				elseif (args[4] == 'fld') then
 					local id = string.upper(args[3])
-					trackids[id] = fld;
+					local tbl = {
+						maxTime = fld,
+						count = 0
+					};
+					trackids[id] = tbl;
 					PPrint(id..' set to '..formatTime(fld));
 				end
 			end
@@ -282,22 +348,26 @@ ashita.events.register('command', 'command_callback1', function (e)
 				if (args[3] == nil) then
 					PPrint('Unable to create timer; Missing parameters (Need profile name)');
 				else
-					local ignore = T{'nickname','zone'};
+					local ignore = T{'nickname','group','zone'};
 					local noprofile = true;
 					for k,v in pairs(profiles) do
 						for k,v in pairs(profiles.PH) do
 							local name = all_trim(k);
 							local lowername = string.lower(name);
 							local nickname = profiles.PH[k].nickname;
-							local zone = profiles.PH[k].zone;
+							local group = profiles.PH[k].group;
+							--local zone = profiles.PH[k].zone;
 							if (string.lower(args[3]) == lowername) then
 								local profile = profiles.PH[k].placeholders;
 								if (profile ~= nil) then
 									for k,v in pairs(profile) do
 										if not ignore:contains(k) then
 											if not tableHasKey(trackids,k) then
-												local id = k;
-												trackids[id] = v;
+												local tbl = {
+													maxTime = v,
+													count = 0
+												};
+												trackids[k] = tbl;
 												PPrint(k..' set to '..formatTime(v));
 											end
 										end
@@ -310,22 +380,28 @@ ashita.events.register('command', 'command_callback1', function (e)
 									for k,v in pairs(profile) do
 										if not ignore:contains(k) then
 											if not tableHasKey(trackids,k) then
-												local id = k;
-												trackids[id] = v;
+												local tbl = {
+													maxTime = v,
+													count = 0
+												};
+												trackids[k] = tbl;
 												PPrint(k..' set to '..formatTime(v));
 											end
 										end
 									end
 									noprofile = false;
 								end
-							elseif (string.lower(args[3]) == string.lower(zone)) then
+							elseif (string.lower(args[3]) == string.lower(group)) then
 								local profile = profiles.PH[k].placeholders;
 								if (profile ~= nil) then
 									for k,v in pairs(profile) do
 										if not ignore:contains(k) then
 											if not tableHasKey(trackids,k) then
-												local id = k;
-												trackids[id] = v;
+												local tbl = {
+													maxTime = v,
+													count = 0
+												};
+												trackids[k] = tbl;
 												PPrint(k..' set to '..formatTime(v));
 											end
 										end
@@ -342,8 +418,11 @@ ashita.events.register('command', 'command_callback1', function (e)
 								for k,v in pairs(profile) do
 									if not ignore:contains(k) then
 										if not tableHasKey(tracknames,k) then
-											local name = k;
-											tracknames[name] = v;
+											local tbl = {
+												maxTime = v,
+												count = 0
+											};
+											tracknames[k] = tbl;
 											PPrint(k..' set to '..formatTime(v));
 										end
 									end
@@ -375,7 +454,11 @@ ashita.events.register('command', 'command_callback1', function (e)
 					local s = tonumber(args[6]);
 					local totaltime = (h * 3600) + (m * 60) + s;
 					local name = string.lower(args[3])
-					tracknames[name] = totaltime;
+					local tbl = {
+						maxTime = totaltime,
+						count = 0
+					};
+					tracknames[name] = tbl;
 					PPrint(name..' set to '..formatTime(totaltime));
 				end;
 			end;
@@ -397,15 +480,15 @@ ashita.events.register('command', 'command_callback1', function (e)
 				end
 				for k,v in pairs(trackids) do
 					if (k == args[3]) then
-						PPrint('Clearing timer '..k);
 						trackids[k] = nil;
+						PPrint('Clearing timer '..k);
 						return;
 					end
 				end
 				for k,v in pairs(tracknames) do
 					if (k == args[3]) then
-						PPrint('Clearing timer '..k);
 						tracknames[k] = nil;
+						PPrint('Clearing timer '..k);
 						return;
 					end
 				end
@@ -418,10 +501,12 @@ ashita.events.register('command', 'command_callback1', function (e)
 					PPrint('Unable to start timer; No timer found');
 				elseif (tableHasKey(trackids, string.upper(args[3]))) then
 					local id = string.upper(args[3])
-					CreateNewTimer(id, trackids[id])
+					trackids[id].count = (trackids[id].count + 1);
+					CreateNewTimer(id, trackids[id].count, trackids[id].maxTime)
 				elseif (tableHasKey(tracknames,string.lower(args[3]))) then
 					local name = string.lower(args[3])
-					CreateNewTimer(name, tracknames[name])
+					tracknames[name].count = (tracknames[name].count + 1);
+					CreateNewTimer(name, tracknames[name].count, tracknames[name].maxTime)
 				else
 					PPrint('No timer found');
 				end;
@@ -438,10 +523,12 @@ ashita.events.register('command', 'command_callback1', function (e)
 					local id = string.upper(args[3]);
 					local name = string.lower(args[3]);
 					if (tableHasKey(trackids,string.upper(args[3]))) then
-						CreateNewTimer(id, totaltime)
+						trackids[id].count = (trackids[id].count + 1);
+						CreateNewTimer(id, trackids[id].count, totaltime)
 						PPrint(id..' started at '..formatTime(totaltime));
 					elseif (tableHasKey(tracknames,string.lower(args[3]))) then
-						CreateNewTimer(name, totaltime)
+						tracknames[name].count = (tracknames[name].count + 1);
+						CreateNewTimer(name, tracknames[name].count, totaltime)
 						PPrint(name..' started at '..formatTime(totaltime));
 					else
 						PPrint('No timer found');
@@ -457,21 +544,21 @@ ashita.events.register('command', 'command_callback1', function (e)
 			else
 				if (trackids ~= nil) then
 					for k,v in pairs(trackids) do
-						PPrint(k..' - '..formatTime(v));
+						PPrint(k..'('..trackids[k].count..') - '..formatTime(trackids[k].maxTime));
 					end;
 				end
 				if (tracknames ~= nil) then
 					for k,v in pairs(tracknames) do
-						PPrint(k..' - '..formatTime(v));
+						PPrint(k..'('..tracknames[k].count..') - '..formatTime(tracknames[k].maxTime));
 					end;
 				end
 			end
+        elseif (cmd == 'zonepr') then
+                zoneProfiles = not zoneProfiles;
+                PPrint('Zone profiles is '..tostring(zoneProfiles));
         elseif (cmd == 'sound') then
                 playsound = not playsound;
                 PPrint('Sound is '..tostring(playsound));
-        elseif (cmd == 'warnpt') then
-                warnpt = not warnpt;
-                PPrint('Warnpt is '..tostring(warnpt));
         elseif (cmd == 'move') then
             if (args[3] == nil or args[4] == nil) then
 				PPrint('Unable to move timers; Missing parameters (Need X Y)');
@@ -508,6 +595,12 @@ ashita.events.register('command', 'command_callback1', function (e)
     end
 end);
 
+ashita.events.register('load', 'load_callback1', function ()
+	if (zoneProfiles == true) then
+		onZoneLoad()
+	end
+end);
+
 ashita.events.register('unload', 'unload_callback1', function ()
     fontTimer:destroy();
 end);
@@ -517,6 +610,10 @@ ashita.events.register('packet_in', 'packet_in_th_cb', function(e)
         onMessage(e.data);
     elseif (e.id == 0x0A or e.id == 0x0B) then
         onZone(e);
+	elseif (e.id == 0x001D) then
+		if (zoneProfiles == true) then
+			onZoneLoad();
+		end
     end
 end);
 
@@ -543,7 +640,7 @@ ashita.events.register('d3d_present', 'present_cb', function ()
             local h = v.time / 3600;
             local m = (v.time % 3600) / 60;
             local s = ((v.time % 3600) % 60);
-            strOut = strOut .. string.format('%s> %02d:%02d:%02d\n', v.label, h, m, s);
+            strOut = strOut .. string.format('%s(%02d)> %02d:%02d:%02d\n', v.label, v.tally, h, m, s);
         end
     end
     fontTimer.text = strOut:sub(1, #strOut - 1);
@@ -563,8 +660,8 @@ ashita.events.register('d3d_present', 'present_cb', function ()
 	end;
 end);
 
-function CreateNewTimer(txtName, maxTime)
-	table.insert(allTimers, { id = txtName .. os.time(), label = txtName, time = maxTime });
+function CreateNewTimer(txtName, totalCount, maxTime)
+	table.insert(allTimers, { id = txtName .. os.time(), label = txtName, tally = totalCount, time = maxTime });
 end;
 
 function PPrint(txt)
