@@ -85,6 +85,14 @@ local profiles = T{
 				['0BE'] = 60,
 			}
 		},
+		['Devil Manta'] = {
+			nickname = 'manta',
+			group = 'angelskin',
+			zone = 'KUFTAL TUNNEL',
+			placeholders = {
+				['005'] = 616,
+			};
+		},
 	},
 	NMsets = {
 		['sky'] = {

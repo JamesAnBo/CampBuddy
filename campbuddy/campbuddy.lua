@@ -585,12 +585,12 @@ ashita.events.register('command', 'command_callback1', function (e)
 	elseif (cmd == 'info') then
 			local id = GetIdForMatch();
 			if (id == '0x0') or (id == nil) then
-				PPrint('Missing or invalid target')
+				PPrint('[Current target ID: No mob target]');
 			else
-				PPrint('Current target ID: '..id);
+				PPrint('[Current target ID: '..id..']');
 			end
-			PPrint('[Position: '..fontTimer.position_x..' '..fontTimer.position_y..'] [Size: '..fontTimer.font_height..']');
-			PPrint('[Sound: '..tostring(playsound)..'] [Background: '..tostring(fontTimer.background.visible)..'] [Visible: '..tostring(fontTimer.visible)..']');
+			PPrint('[Position: '..fontTimer.position_x..' '..fontTimer.position_y..'] [Size: '..fontTimer.font_height..'] [Background: '..tostring(fontTimer.background.visible)..']');
+			PPrint('[Sound: '..tostring(playsound)..'] [Zone Profiles: '..tostring(zoneProfiles)..'] [Visible: '..tostring(fontTimer.visible)..']');
 		end
     end
 end);
