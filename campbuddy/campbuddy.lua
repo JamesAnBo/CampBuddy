@@ -245,8 +245,8 @@ local function onMessage(data)
 				--PPrint(k..' '..v);
 				if (k == targetNameTrimLower) then
 					tracknames[targetNameTrimLower].count = (tracknames[targetNameTrimLower].count + 1)
-					CreateNewTimer(targetNameTrim, tracknames[targetNameTrimLower].count, tracknames[targetNameTrimLower].maxTime)
-					PPrint(targetNameTrim..' timer started')
+					CreateNewTimer(targetNameTrimLower, tracknames[targetNameTrimLower].count, tracknames[targetNameTrimLower].maxTime)
+					PPrint(targetNameTrimLower..' timer started')
 				end
             end
 		end
@@ -578,20 +578,22 @@ ashita.events.register('command', 'command_callback1', function (e)
 				tracknames = {};
 				PPrint('Clearing all timers.');
 			else
+				local id = string.upper(args[3]);
+				local name = string.lower(args[3]);
 				for i=1,#allTimers do
 					if (allTimers[i].label == args[3]) then
 						allTimers[i].time = 0;
 					end
 				end
 				for k,v in pairs(trackids) do
-					if (k == args[3]) then
+					if (k == id) then
 						trackids[k] = nil;
 						PPrint('Clearing timer '..k);
 						return;
 					end
 				end
 				for k,v in pairs(tracknames) do
-					if (k == args[3]) then
+					if (k == name) then
 						tracknames[k] = nil;
 						PPrint('Clearing timer '..k);
 						return;
