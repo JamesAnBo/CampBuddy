@@ -223,6 +223,7 @@ local function onMessage(data)
 
 		local targetName = AshitaCore:GetMemoryManager():GetEntity():GetName(sender);
 		local targetNameTrim = all_trim(targetName);
+		local targetNameTrimLower = string.lower(targetNameTrim);
         local targetServerId = AshitaCore:GetMemoryManager():GetEntity():GetServerId(sender);
         local targetServerIdHex = string.format('0x%X', targetServerId);
     
@@ -242,9 +243,9 @@ local function onMessage(data)
 		if (tracknames ~= nil) then
 			for k,v in pairs(tracknames) do
 				--PPrint(k..' '..v);
-				if (k == string.lower(targetNameTrim)) then
-					tracknames[k].count = (tracknames[k].count + 1)
-					CreateNewTimer(targetNameTrim, tracknames[k].count, tracknames[k].maxTime)
+				if (k == targetNameTrimLower) then
+					tracknames[targetNameTrimLower].count = (tracknames[targetNameTrimLower].count + 1)
+					CreateNewTimer(targetNameTrim, tracknames[targetNameTrimLower].count, tracknames[targetNameTrimLower].maxTime)
 					PPrint(targetNameTrim..' timer started')
 				end
             end
@@ -516,14 +517,16 @@ ashita.events.register('command', 'command_callback1', function (e)
 							local profile = profiles.NMsets[k];
 							if (profile ~= nil) then
 								for k,v in pairs(profile) do
+									nameTrim = all_trim(k)
+									nameTrimLower = string.lower(nameTrim)
 									if not ignore:contains(k) then
-										if not tableHasKey(tracknames,k) then
+										if not tableHasKey(tracknames,nameTrimLower) then
 											local tbl = {
 												maxTime = v,
 												count = 0
 											};
-											tracknames[k] = tbl;
-											PPrint(k..' set to '..formatTime(v));
+											tracknames[nameTrimLower] = tbl;
+											PPrint(nameTrimLower..' set to '..formatTime(v));
 										end
 									end
 								end
@@ -607,8 +610,8 @@ ashita.events.register('command', 'command_callback1', function (e)
 					local id = string.upper(args[3])
 					trackids[id].count = (trackids[id].count + 1);
 					CreateNewTimer(id, trackids[id].count, trackids[id].maxTime)
-				elseif (tableHasKey(tracknames,args[3])) then
-					local name = args[3];
+				elseif (tableHasKey(tracknames,string.lower(args[3]))) then
+					local name = string.lower(args[3]);
 					tracknames[name].count = (tracknames[name].count + 1);
 					CreateNewTimer(name, tracknames[name].count, tracknames[name].maxTime)
 				else
@@ -630,7 +633,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 						trackids[id].count = (trackids[id].count + 1);
 						CreateNewTimer(id, trackids[id].count, totaltime)
 						PPrint(id..' started at '..formatTime(totaltime));
-					elseif (tableHasKey(tracknames,args[3])) then
+					elseif (tableHasKey(tracknames,name)) then
 						tracknames[name].count = (tracknames[name].count + 1);
 						CreateNewTimer(name, tracknames[name].count, totaltime)
 						PPrint(name..' started at '..formatTime(totaltime));
