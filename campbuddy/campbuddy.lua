@@ -928,7 +928,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 		elseif (cmd:any('message', 'msg')) then
 			
 				messages = not messages
-				PPrint('Messages changed to '..tostring(messages));		
+				print(chat.header(addon.name):append(chat.message('Messages changed to '..tostring(messages))));		
 		
 	--[[	Toggle sound when a timer reaches 00:00:00	]]--
         elseif (cmd:any('sound', 'alert')) then
@@ -1003,7 +1003,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 	--[[	Toggle isDebug messages	]]--		
 		elseif (cmd:any('debug')) then
 			isDebug = not isDebug;
-			PPrint('Debug set to '..tostring(isDebug));
+			print(chat.header(addon.name):append(chat.message('Debug set to '..tostring(isDebug))));
 			
 	--[[	Print current settings	]]--
 		elseif (cmd:any('info')) then
