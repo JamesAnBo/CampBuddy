@@ -21,6 +21,7 @@ Here are your campbuddy commands:
 /cbud list  print timers list.
 /cbud move <X> <Y>  move the timers.
 /cbud sound  toggle sound when a timer reaches 00:00:00.
+/cbud sound  <#>  changed alert sound (1-7).
 /cbud info  prints target ID, clock position, and sound status.
 /cbud help  print help.
 ```
@@ -45,6 +46,7 @@ v.2.0<br />
  -addid can now take 8-digit IDs in addition to the normal 3-character hex IDs.<br />
  -Message format changed for asthetic reasons.<br />
  -Added messages when loading profiles for which NM profile is being loaded.<br />
+ -Added the sound <#> command to change the alert sound. (1-7)<br />
  -Added a bunch of NM profiles; still tons more to ad.<br />
 
 
