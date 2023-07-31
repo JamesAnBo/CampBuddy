@@ -268,11 +268,11 @@ local function check_countDown(s)
 	-- Is countdown timer active..
 	for i,v in ipairs(countDown) do
 		if s == v.label then
-			if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'['..s..'] == ['..v.label..'] true') end;
+			if (isDebug == true) then Debug_Print('['..s..'] == ['..v.label..'] true',__FUNC__()..':'..__LINE__()) end;
 			return true;
 		end
 	end
-	if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'['..s..'] false') end;
+	if (isDebug == true) then Debug_Print('['..s..'] false',__FUNC__()..':'..__LINE__()) end;
 	return false;
 end
 
@@ -281,17 +281,17 @@ local function check_countUp(s)
 	-- Is countup timer active..
 	for i,v in pairs(countUp) do
 		if s == v.label then
-			if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'['..s..'] == ['..v.label..'] true') end;
+			if (isDebug == true) then Debug_Print('['..s..'] == ['..v.label..'] true',__FUNC__()..':'..__LINE__()) end;
 			return true
 		end
 	end
-	if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'['..s..'] false') end;
+	if (isDebug == true) then Debug_Print('['..s..'] false',__FUNC__()..':'..__LINE__()) end;
 	return false
 end
 
 local function remove_countDown(s)
 
-	if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'['..s..']') end;
+	if (isDebug == true) then Debug_Print('['..s..']',__FUNC__()..':'..__LINE__()) end;
 
 	-- Stop/Remove countdown timer..
 	if s == 'ALL' then
@@ -313,7 +313,7 @@ local function remove_countDown(s)
 end
 local function remove_countUp(s)
 
-	if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'['..s..']') end;
+	if (isDebug == true) then Debug_Print('['..s..']',__FUNC__()..':'..__LINE__()) end;
 
 	-- Stop/Remove countup timer..
 	if s == 'ALL' then
@@ -366,7 +366,7 @@ local function onMessage(data)
 			for k,v in pairs(trackids) do
 				if (k == idStringUpper) then
 				
-					if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'['..k..'] == ['..idStringUpper..']') end;
+					if (isDebug == true) then Debug_Print('['..k..'] == ['..idStringUpper..']',__FUNC__()..':'..__LINE__()) end;
 				
 					remove_countUp(idStringUpper)
 					remove_countDown(idStringUpper)
@@ -380,7 +380,7 @@ local function onMessage(data)
 		if (tracknames ~= nil) then
 			for k,v in pairs(tracknames) do
 				if (k == targetNameTrimUpper) then
-					if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'['..k..'] == ['..targetNameTrimUpper..']') end;
+					if (isDebug == true) then Debug_Print('['..k..'] == ['..targetNameTrimUpper..']',__FUNC__()..':'..__LINE__()) end;
 					remove_countUp(targetNameTrimUpper)
 					remove_countDown(targetNameTrimUpper)
 					
@@ -408,7 +408,7 @@ end
 --[[	Clears tracked IDs (not names) on zone; Does not stop current running clocks	]]--
 
 local function onZone(e)
-	if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'[on zone]') end;
+	if (isDebug == true) then Debug_Print('[on zone]',__FUNC__()..':'..__LINE__()) end;
     trackids = T{};
 	
 end;
@@ -416,7 +416,7 @@ end;
 --[[	Load profiles when zoning in	]]--
 
 local function onZoneLoad(e)
-	if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'[on zone load]') end;
+	if (isDebug == true) then Debug_Print('[on zone load]',__FUNC__()..':'..__LINE__()) end;
 	local ignore = T{'nickname','group','zone'};
 	local loaded = false;
 	for k,v in pairs(profiles.PH) do
@@ -425,7 +425,7 @@ local function onZoneLoad(e)
 		local nickname = profiles.PH[k].nickname;
 		local zone = profiles.PH[k].zone;
 		if (GetZone() == string.upper(zone)) then
-			if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'[zone match]') end;
+			if (isDebug == true) then Debug_Print('[zone match]',__FUNC__()..':'..__LINE__()) end;
 			local profile = profiles.PH[k].placeholders;
 			if (profile ~= nil) then
 			
@@ -470,7 +470,7 @@ local function HandleOutgoingChunk(e)
 	if (do_tables_match(t, mySchedule)) then
 		if (t.hour == mySchedule.hour) and (t.min == mySchedule.min) and ((t.sec == mySchedule.sec)) then
 			if (IntervalActive == true) and not (IsInterval()) then
-				if (isDebug == true) then Debug_Print(__FUNC__()..':'..__LINE__(),'[interval scheduled time match]') end;
+				if (isDebug == true) then Debug_Print('[interval scheduled time match]',__FUNC__()..':'..__LINE__()) end;
 				repeater()
 			end
 		end
