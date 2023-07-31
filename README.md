@@ -53,3 +53,4 @@ v.2.0<br />
 Known issues:<br />
   -Timers sometimes remain on screen after reaching 0.<br />
   -Bottom count up timer creates an extra blank line below it.
+  -If a name(not id) timer restarts before it's countdown ends it creates a counddown and a countup timer.
