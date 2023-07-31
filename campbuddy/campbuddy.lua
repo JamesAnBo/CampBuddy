@@ -43,7 +43,6 @@ local countDown = {};	-- NO TOUCH!
 local globalTimer = 0;	-- NO TOUCH!
 local globalDelay = 1;	-- NO TOUCH!
 local cleanup = false;
-local cleanup_cu = T{};
 local isCountDown = T{};
 local isCountUp = T{};
 
@@ -759,7 +758,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 	--[[	Add timer by defined name	]]--
 		elseif (cmd:any('addnm', 'nmadd')) then
 			if (args[3] == nil or args[4] == nil or args[5] == nil or args[6] == nil) then
-					PPrint('Unable to create timer; Missing parameters (Need ID H M S)');
+					PPrint('Unable to create timer; Missing or invalid parameters (Needs name H M S)');
 			elseif (#args >= 3) then
 				local tbl = T{};
 				local nums = T{};
@@ -773,17 +772,21 @@ ashita.events.register('command', 'command_callback1', function (e)
 				end
 				local str = string.format("%s", table.concat(tbl, ''));
 				local strUpper = string.upper(str)
-				if (isDebug == true) then Debug_Print('cmd: '..args[2]..', custom time',__LINE__()) end;
-				local h = tonumber(nums[1]);
-				local m = tonumber(nums[2]);
-				local s = tonumber(nums[3]);
-				local totaltime = (h * 3600) + (m * 60) + s;
-				local ttbl = {
-					maxTime = totaltime,
-					count = 0
-				};
-				tracknames[strUpper] = ttbl;
-				PPrint(strUpper..' set to '..formatTime(totaltime));
+				if (#nums >= 3) then
+					if (isDebug == true) then Debug_Print('cmd: '..args[2]..', custom time',__LINE__()) end;
+					local h = tonumber(nums[1]);
+					local m = tonumber(nums[2]);
+					local s = tonumber(nums[3]);
+					local totaltime = (h * 3600) + (m * 60) + s;
+					local ttbl = {
+						maxTime = totaltime,
+						count = 0
+					};
+					tracknames[strUpper] = ttbl;
+					PPrint(strUpper..' set to '..formatTime(totaltime));
+				else
+					PPrint('Unable to create timer; Missing or invalid parameters (Needs name H M S)');
+				end
 			end;
 			
 	--[[	Clear all or defined timers	]]--
@@ -1333,13 +1336,15 @@ end;
 --[[	Make print look good	]]--
 
 function PPrint(txt)
-
-    print(chat.header(addon.name):append(chat.message(txt)));
-	
+	if (messages == true) then
+		print(chat.header(addon.name):append(chat.message(txt)));
+	end
 end
 
 function Print_Profile_Load(s)
-	print(chat.header(addon.name):append(chat.error('Profile: ')):append(chat.message(s):append(' - ')):append(chat.color1(6, 'loaded')));
+	if (messages == true) then
+		print(chat.header(addon.name):append(chat.error('Profile: ')):append(chat.message(s):append(' - ')):append(chat.color1(6, 'loaded')));
+	end
 end;
 
 
