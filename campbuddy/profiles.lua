@@ -32,6 +32,101 @@ local profiles = T{
 				['111'] = 976, --respawn is?
 			};
 		},
+	-- 'BATALLIA DOWNS
+		['Prankster Mavrix'] = { 
+			nickname = 'Prankster',
+			group = 'Battalia',
+			zone = 'BATALLIA DOWNS',
+			placeholders = { 
+				['153'] = 976,
+			};
+		},
+		['Prankster Mavrix'] = { 
+			nickname = 'Prankster',
+			group = 'Battalia',
+			zone = 'BATALLIA DOWNS',
+			placeholders = { 
+				['153'] = 976,
+			};
+		},
+		['Totering Toby'] = { 
+			nickname = 'Totering',
+			group = 'Battalia',
+			zone = 'BATALLIA DOWNS',
+			placeholders = { 
+				['099'] = 976,
+			};
+		},
+	-- BEADEAUX
+		['Ga\'Bhu Unvanquished'] = {
+			nickname = 'gabhu',
+			group = 'turts',
+			zone = 'BEADEAUX',
+			placeholders = {
+				['129'] = 976,
+			};
+		},
+		['Bi Gho Headtaker'] = { 
+			nickname = 'BGH',
+			group = 'turts',
+			zone = 'BEADEAUX',
+			placeholders = { 
+				['016'] = 976,
+			};
+		},
+		['Da Dha Hundredmask'] = { 
+			nickname = 'DDH',
+			group = 'turts',
+			zone = 'BEADEAUX',
+			placeholders = { 
+				['062'] = 976,
+				['065'] = 976,
+				['068'] = 976,
+			};
+		},
+		['Ge Dha Evileye'] = { 
+			nickname = 'GDE',
+			group = 'turts',
+			zone = 'BEADEAUX',
+			placeholders = { 
+				['077'] = 976,
+			};
+		},
+		['Zo Khu Blackcloud'] = { 
+			nickname = 'ZKB',
+			group = 'turts',
+			zone = 'BEADEAUX',
+			placeholders = { 
+				['0EA'] = 976,
+			};
+		},
+	-- BEAUCEDINE GLACIER
+		['Gargantua'] = { 
+			nickname = 'Garga',
+			group = 'glacier',
+			zone = 'BEAUCEDINE GLACIER',
+			placeholders = { 
+				['0CE'] = 976,
+			};
+		},
+		['Kirata'] = { 
+			nickname = 'Kirat',
+			group = 'glacier',
+			zone = 'BEAUCEDINE GLACIER',
+			placeholders = { 
+				['0AA'] = 976,
+				['0AB'] = 976,
+			};
+		},
+		['Nue'] = { 
+			nickname = 'Nue',
+			group = 'glacier',
+			zone = 'BEAUCEDINE GLACIER',
+			placeholders = { 
+				['061'] = 976,
+				['062'] = 976,
+			};
+		},
 	-- BIBIKI BAY
 		['Serra'] = {
 			nickname = 'serra',
@@ -57,6 +152,53 @@ local profiles = T{
 			placeholders = {
 				['039'] = 976,
 				['03A'] = 976,
+			};
+		},
+		['Shii'] = {
+			nickname = 'shii',
+			group = 'sewers',
+			zone = 'BOSTAUNIEUX OUBLIETTE',
+			placeholders = {
+				['03C'] = 346,
+				['03D'] = 346,
+				['03E'] = 346,
+			};
+		},
+		['Arioch'] = {
+			nickname = 'arioch',
+			group = 'sewers',
+			zone = 'BOSTAUNIEUX OUBLIETTE',
+			placeholders = {
+				['0AF'] = 346,
+				['0B0'] = 346,
+				['0B1'] = 346,
+				['0B2'] = 346,
+			};
+		},
+		['Manes'] = {
+			nickname = 'manes',
+			group = 'sewers',
+			zone = 'BOSTAUNIEUX OUBLIETTE',
+			placeholders = {
+				['0DE'] = 346,
+				['0B2'] = 346,
+			};
+		},
+	-- BUBURIMU PENINSULA
+		['Helldiver'] = { 
+			nickname = '',
+			group = '',
+			zone = '',
+			placeholders = {
+				['16A'] = 346,
+			};
+		},
+		['Buburimboo'] = { 
+			nickname = '',
+			group = '',
+			zone = '',
+			placeholders = {
+				['1CA'] = 346,
 			};
 		},
 	-- CASTLE OZTROJA

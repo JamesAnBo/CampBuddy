@@ -1,6 +1,6 @@
 addon.name      = 'campbuddy';
 addon.author    = 'Aesk';
-addon.version   = '2.0';
+addon.version   = '2.0.1';
 addon.desc      = 'Placeholder repop clock';
 addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
@@ -928,7 +928,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 		elseif (cmd:any('message', 'msg')) then
 			
 				messages = not messages
-				print(chat.header(addon.name):append(chat.message('Messages changed to '..tostring(messages))));		
+				print(chat.header(addon.name):append(chat.message('Messages changed to '..tostring(messages))));
 		
 	--[[	Toggle sound when a timer reaches 00:00:00	]]--
         elseif (cmd:any('sound', 'alert')) then
@@ -944,6 +944,9 @@ ashita.events.register('command', 'command_callback1', function (e)
 					sound = ('Sound0'..args[3]..'.wav')
 					PPrint('Alert changed to '..args[3]);
 				end
+			end
+			if (playsound == true) then
+				ashita.misc.play_sound(addon.path:append('\\sounds\\'):append(sound));
 			end
 			
 	--[[	Move the active timers display	]]--
