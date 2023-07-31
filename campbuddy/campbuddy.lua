@@ -511,6 +511,7 @@ local function helpmsg(isError)
 		{'/cbud bg    ', 'toggle background'},
 		{'/cbud hide    ', 'toggle visibility'},
 		{'/cbud sound    ', 'toggle sound when a timer reaches 00:00:00.'},
+		{'/cbud sound  <#>  ', 'changed alert sound. (1-7)'},
 		{'/cbud info    ', 'print some info.'},
 		{'/cbud help    ', 'print help.'},
 	};
