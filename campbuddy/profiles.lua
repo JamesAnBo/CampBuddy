@@ -359,6 +359,15 @@ local profiles = T{
 				['126'] = 346
 			};
 		},
+		['Ruby Quadav'] = {
+			nickname = 'ruby',
+			group = 'qulun',
+			zone = 'QULUN DOME',
+			placeholders = {
+				['009'] = 976,
+				['011'] = 976,
+			};
+		},
 	},
 	NMsets = {
 		['sky'] = {
