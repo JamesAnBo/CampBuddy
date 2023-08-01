@@ -63,7 +63,7 @@ local profiles = T{
 			group = 'turts',
 			zone = 'BEADEAUX',
 			placeholders = {
-				['129'] = 976,
+				['129'] = ,
 			};
 		},
 		['Bi Gho Headtaker'] = { 
@@ -106,7 +106,7 @@ local profiles = T{
 			group = 'glacier',
 			zone = 'BEAUCEDINE GLACIER',
 			placeholders = { 
-				['0CE'] = 976,
+				['0CE'] = 346,
 			};
 		},
 		['Kirata'] = { 
@@ -114,8 +114,8 @@ local profiles = T{
 			group = 'glacier',
 			zone = 'BEAUCEDINE GLACIER',
 			placeholders = { 
-				['0AA'] = 976,
-				['0AB'] = 976,
+				['0AA'] = 346,
+				['0AB'] = 346,
 			};
 		},
 		['Nue'] = { 
@@ -123,8 +123,8 @@ local profiles = T{
 			group = 'glacier',
 			zone = 'BEAUCEDINE GLACIER',
 			placeholders = { 
-				['061'] = 976,
-				['062'] = 976,
+				['061'] = 346,
+				['062'] = 346,
 			};
 		},
 	-- BIBIKI BAY
@@ -329,8 +329,8 @@ local profiles = T{
 			group = 'sea',
 			zone = 'THE GARDEN OF RUHMET',
 			placeholders = {
-				['1BA'] = 60,
-				['1BE'] = 60,
+				['1BA'] = 10,
+				['1BE'] = 10,
 			}
 		},
 	-- VALKURM DUNES
@@ -364,8 +364,8 @@ local profiles = T{
 			group = 'qulun',
 			zone = 'QULUN DOME',
 			placeholders = {
-				['009'] = 976,
-				['011'] = 976,
+				['009'] = 1216,
+				['011'] = 1216,
 			};
 		},
 	},
