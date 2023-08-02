@@ -63,7 +63,7 @@ local profiles = T{
 			group = 'turts',
 			zone = 'BEADEAUX',
 			placeholders = {
-				['129'] = ,
+				['129'] = 976,
 			};
 		},
 		['Bi Gho Headtaker'] = { 
