@@ -1,17 +1,6 @@
-local profiles = {}
+local profiles = {};
 
---[[
-		[''] = {
-			nickname = '',
-			group = '',
-			zone = '',
-			placeholders = {
-				[''] = 000,
-			};
-		},
-]]--
-
-local profiles = T{
+profiles = T{
 	PH = {
 	-- ATTOHWA CHASM
 		['Ambusher Antlion'] = {
@@ -58,7 +47,7 @@ local profiles = T{
 			};
 		},
 	-- BEADEAUX
-		['Ga\'Bhu Unvanquished'] = {
+		['Ga Bhu Unvanquished'] = {
 			nickname = 'gabhu',
 			group = 'turts',
 			zone = 'BEADEAUX',
@@ -186,17 +175,17 @@ local profiles = T{
 		},
 	-- BUBURIMU PENINSULA
 		['Helldiver'] = { 
-			nickname = '',
-			group = '',
-			zone = '',
+			nickname = 'Helldiver',
+			group = 'bubu',
+			zone = 'BUBURIMU PENINSULA',
 			placeholders = {
 				['16A'] = 346,
 			};
 		},
 		['Buburimboo'] = { 
-			nickname = '',
-			group = '',
-			zone = '',
+			nickname = 'Buburimboo',
+			group = 'bubu',
+			zone = 'BUBURIMU PENINSULA',
 			placeholders = {
 				['1CA'] = 346,
 			};
@@ -225,7 +214,55 @@ local profiles = T{
 			nickname = 'mjuu',
 			group = 'giddeus',
 			zone = 'GIDDEUS',
-			['179'] = 976
+			placeholders = {
+				['179'] = 976,
+			};
+		},
+	-- GUSTAV TUNNEL
+		['Goblinsavior Heronox'] = {
+			nickname = 'Goblinsavior',
+			group = 'gustav',
+			zone = 'GUSTAV TUNNEL',
+			placeholders = {
+				['025'] = 976,
+			};
+		},
+		['Wyvernpoacher Drachlox'] = {
+			nickname = 'Wyvernpoacher',
+			group = 'gustav',
+			zone = 'GUSTAV TUNNEL',
+			placeholders = {
+				['041'] = 976,
+			};
+		},
+		['Taxim'] = {
+			nickname = 'Taxim',
+			group = 'gustav',
+			zone = 'GUSTAV TUNNEL',
+			placeholders = {
+				['03A'] = 976,
+				['0AA'] = 976,
+				['0AB'] = 976,
+				['0B0'] = 976,
+			};
+		},
+		['Ungur'] = {
+			nickname = 'Ungur',
+			group = 'gustav',
+			zone = 'GUSTAV TUNNEL',
+			placeholders = {
+				['0BA'] = 976,
+			};
+		},
+		['Amikiri'] = {
+			nickname = 'Amikiri',
+			group = 'gustav',
+			zone = 'GUSTAV TUNNEL',
+			placeholders = {
+				['0C3'] = 976,
+				['0C8'] = 976,
+				['0CC'] = 976,
+			};
 		},
 	-- KUFTAL TUNNEL
 		['Devil Manta'] = {

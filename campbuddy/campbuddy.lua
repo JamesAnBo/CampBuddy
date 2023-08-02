@@ -4,16 +4,16 @@ addon.version   = '2.0.1';
 addon.desc      = 'Placeholder repop clock';
 addon.link      = 'https://github.com/JamesAnBo/CampBuddy';
 
-require('common');
-local chat = require('chat');
-local zones = require('zones');
-local ffi = require("ffi");
+require('common')
+local chat = require('chat')
+local zones = require('zones')
+local ffi = require("ffi")
 ffi.cdef[[
     int32_t memcmp(const void* buff1, const void* buff2, size_t count);
 ]];
 
-local profiles = require('profiles');
-local fonts = require('fonts');
+local profiles = require('profiles')
+local fonts = require('fonts')
 
 
 local IntervalActive = false;	-- NO TOUCH!
@@ -97,7 +97,9 @@ local function args_iterator (col)
 end
 
 local function decimalToHex(num)
-
+	
+	local num = tonumber(num);
+	
 	-- Convert ARGB color values to hex color values..
     if num == 0 then
         return '0'
@@ -587,8 +589,8 @@ ashita.events.register('command', 'command_callback1', function (e)
 			if (#args == 6) then
 				if (args[3] == nil or args[4] == nil or args[5] == nil or args[6] == nil) then
 					PPrint('Unable to create timer; Missing parameters (Need ID H M S)');
-				elseif (string.len(args[3]) ~= 3) or (string.len(args[3]) ~= 8) then
-					PPrint('Unable to create timer; ID must be 3 characters');
+				elseif not ((string.len(args[3]) == 3) or (string.len(args[3]) == 8)) then
+					PPrint('Unable to create timer; must be 3 character hex, or 8 decimal ID');
 				elseif (not IsNum(args[4]) or not IsNum(args[5]) or not IsNum(args[6])) then
 					PPrint('Unable to create timer; H M S must be numbers')
 				else
@@ -612,6 +614,7 @@ ashita.events.register('command', 'command_callback1', function (e)
 					PPrint(a_id..' set to '..formatTime(totaltime));
 				end;
 			elseif (#args == 4) then
+				
 				if (args[3] == nil or args[4] == nil or IsNum(args[4]))  then
 					PPrint('Unable to create timer; Missing parameters (Need ID and zone type)');
 				elseif (string.len(args[3]) ~= 3) then
@@ -665,10 +668,13 @@ ashita.events.register('command', 'command_callback1', function (e)
 				local ignore = T{'nickname','group','zone'};
 				for k,v in pairs(profiles.PH) do
 					local name = all_trim(k);
+					--PPrint('name: '..name)
 					local nickname = profiles.PH[k].nickname;
 					local nicknameTrim = all_trim(nickname);
+					--PPrint('nickname: '..nicknameTrim)
 					local group = profiles.PH[k].group;
 					local groupTrim = all_trim(group);
+					--PPrint('group: '..groupTrim)
 					if (strUpper == string.upper(name)) then
 						if (isDebug == true) then Debug_Print('cmd: '..args[2]..', from name',__LINE__()) end;
 						local profile = profiles.PH[k].placeholders;
