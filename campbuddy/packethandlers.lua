@@ -135,6 +135,9 @@ packethandlers.HandleOutgoingChunk = function(e)
 	if (helpers.do_tables_match(t, clocks.my_schedule)) then
 		if (t.hour == clocks.my_schedule.hour) and (t.min == clocks.my_schedule.min) and ((t.sec == clocks.my_schedule.sec)) then
 			if (clocks.interval_active == true) and not (IsInterval()) then
+				if (campbuddy.settings.playsound == true) then
+					ashita.misc.play_sound(addon.path:append('\\sounds\\'):append(campbuddy.settings.sound));
+				end
 				packethandlers.repeater()
 			end
 		end

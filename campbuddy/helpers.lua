@@ -1,6 +1,9 @@
 local helpers = {};
 
 helpers.args_iterator = function(col)
+	if (col == nil) then
+		return;
+	end
 
 	-- Return args[4+] for concat..
 	local index = 3
@@ -16,7 +19,9 @@ helpers.args_iterator = function(col)
 end
 
 helpers.decimalToHex = function(num)
-	
+	if (num == nil) then
+		return;
+	end
 	local num = tonumber(num);
 	
 	-- Convert ARGB color values to hex color values..
@@ -43,13 +48,17 @@ end
 
 
 helpers.IsNum = function(str)
-
+	if (str == nil) then
+		return;
+	end
 	-- Is str a number..
 	return not (str == "" or str:find("%D"))
 end
 
 helpers.all_trim = function(str)
-
+	if (str == nil) then
+		return;
+	end
 	-- Return str without spaces..
    return str:gsub("%s+", "")
 end
